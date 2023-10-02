@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uno_CardGame", "Uno_CardGame\Uno_CardGame.csproj", "{92E4338B-8268-4A62-BEA7-81382A14D317}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E7EBD239-BA01-4086-B2BB-FBDA3F3760EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{9FC40147-7C6D-438C-9833-1A5C84241022}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoEngine", "UnoEngine\UnoEngine.csproj", "{C59B156B-4D7F-4D9F-BA42-F1DEA9B2E832}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{8E441EEC-F625-4872-8201-F548D4B4A268}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,10 +14,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{92E4338B-8268-4A62-BEA7-81382A14D317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92E4338B-8268-4A62-BEA7-81382A14D317}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92E4338B-8268-4A62-BEA7-81382A14D317}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92E4338B-8268-4A62-BEA7-81382A14D317}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9FC40147-7C6D-438C-9833-1A5C84241022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9FC40147-7C6D-438C-9833-1A5C84241022}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FC40147-7C6D-438C-9833-1A5C84241022}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -26,5 +22,9 @@ Global
 		{C59B156B-4D7F-4D9F-BA42-F1DEA9B2E832}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C59B156B-4D7F-4D9F-BA42-F1DEA9B2E832}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C59B156B-4D7F-4D9F-BA42-F1DEA9B2E832}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E441EEC-F625-4872-8201-F548D4B4A268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E441EEC-F625-4872-8201-F548D4B4A268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E441EEC-F625-4872-8201-F548D4B4A268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E441EEC-F625-4872-8201-F548D4B4A268}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -2,10 +2,11 @@ namespace MenuSystem;
 
 public class Menu
 {
-    public string? Title { get; set; } 
-    public Dictionary<String, MenuItem> MenuItems { get; set; } = new();
+    public string? Title { get; set; }
+    public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
+
+    private const string MenuSeparator = "=======================";
     private static readonly HashSet<string> ReservedShortcuts = new() {"x", "b", "r"};
-    private const string MenuSeparator = "=================";
 
     public Menu(string? title, List<MenuItem> menuItems)
     {
@@ -26,9 +27,8 @@ public class Menu
 
             MenuItems[menuItem.Shortcut.ToLower()] = menuItem;
         }
-
     }
-    
+
     private void Draw()
     {
         if (!string.IsNullOrWhiteSpace(Title))
@@ -53,7 +53,6 @@ public class Menu
 
         Console.WriteLine(MenuSeparator);
         Console.Write("Your choice:");
-
     }
 
     public string Run(EMenuLevel menuLevel = EMenuLevel.First)
@@ -73,7 +72,7 @@ public class Menu
                     var result = "";
                     if (menuLevel == EMenuLevel.First)
                     {
-                        result = MenuItems[userChoice!.ToLower()].SubMenuToRun!(EMenuLevel.Second);
+                         result = MenuItems[userChoice!.ToLower()].SubMenuToRun!(EMenuLevel.Second);
                     }
                     else
                     {
@@ -101,5 +100,4 @@ public class Menu
 
         return userChoice;
     }
-    
 }
