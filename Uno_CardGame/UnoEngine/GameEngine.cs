@@ -1,5 +1,5 @@
 ﻿namespace UnoEngine;
-
+//gameengine class, if constructed, creates a list with players: ATM 1 human + 1 AI
 public class GameEngine
 {
     public List<Player> Players { get; set; } = new List<Player>()

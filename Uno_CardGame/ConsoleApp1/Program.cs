@@ -44,7 +44,6 @@ string? runNewGameMenu()
         }
     );
     
-    
     return startNewGameMenu.Run(EMenuLevel.Second);
 }
 
