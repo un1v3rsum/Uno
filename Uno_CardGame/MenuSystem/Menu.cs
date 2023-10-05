@@ -2,108 +2,112 @@ namespace MenuSystem;
 //menu class
 public class Menu
 {
+    private readonly EMenuLevel _level;
     public string? Title { get; set; }
+    //container for menuItems
     public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
-
     private const string MenuSeparator = "=======================";
-    private static readonly HashSet<string> ReservedShortcuts = new() {"x", "b", "r"};
+    private const string ShortcutExit = "x";
+    private const string ShortcutBack = "b";
+    private const string ShortcutReturnToMain = "r";
+    //private menuItems, not accessible by the player 
+    private readonly MenuItem _menuItemExit = new MenuItem("Exit", ShortcutExit, null);
+    private readonly MenuItem _menuItemBack = new MenuItem("Back", ShortcutBack, null);
+    private readonly MenuItem _menuItemReturnToMain = new MenuItem("Return to Main",  ShortcutReturnToMain, null);
 
-    public Menu(string? title, List<MenuItem> menuItems)
+
+    public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
+        _level = level;
         Title = title;
         foreach (var menuItem in menuItems)
-        {
-            if (ReservedShortcuts.Contains(menuItem.Shortcut.ToLower()))
-            {
-                throw new ApplicationException(
-                    $"Menu shortcut '{menuItem.Shortcut.ToLower()}' in not allowed list!");
-            }
-
+        {   
+            //exception for repeating shortcuts
             if (MenuItems.ContainsKey(menuItem.Shortcut.ToLower()))
             {
                 throw new ApplicationException(
                     $"Menu shortcut '{menuItem.Shortcut.ToLower()}' is already registered!");
             }
-
-            MenuItems[menuItem.Shortcut.ToLower()] = menuItem;
+            //loop through all menuItems and add to dict
+            MenuItems.Add(menuItem.Shortcut, menuItem);
+            
         }
+        //BACK not seen in the first level
+        if (_level != EMenuLevel.First)
+            MenuItems.Add(ShortcutBack, _menuItemBack);
+        //RETURN TO MAIN only seen in lower levels (not 1. & 2.)
+        if (_level == EMenuLevel.Other)
+            MenuItems.Add(ShortcutReturnToMain, _menuItemReturnToMain);
+        //EXIT seen in every level
+        MenuItems.Add(ShortcutExit, _menuItemExit);
     }
-
-    private void Draw(EMenuLevel menuLevel)
+    //method for drawing the menusystem
+    private void Draw()
     {
         if (!string.IsNullOrWhiteSpace(Title))
         {
             Console.WriteLine(Title);
             Console.WriteLine(MenuSeparator);
         }
-
+        //loop through all the menuItems and write them on console
         foreach (var menuItem in MenuItems)
         {
             Console.Write(menuItem.Key);
             Console.Write(") ");
             Console.WriteLine(menuItem.Value.MenuLabel);
-            
         }
-        //"Back" doesn't appear in first level
-        if (menuLevel == EMenuLevel.Second)
-        {
-            Console.WriteLine("b) Back");
-        }
-        //"return to main" in deeper levels
-        else if (menuLevel == EMenuLevel.Other)
-        {
-            Console.WriteLine("b) Back");
-            Console.WriteLine("r) Return to main");
-        }
-        
-        Console.WriteLine("x) eXit");
         Console.WriteLine(MenuSeparator);
         Console.Write("Your choice:");
     }
-
-    public string Run(EMenuLevel menuLevel = EMenuLevel.First)
-    {
+    //method for running the menuSystem
+    public string Run()
+    {   
+        //clear the buffer
         Console.Clear();
-
+        //boolean for do-while loop
+        var menuDone = false;
         var userChoice = "";
         do
         {
-            Draw(menuLevel);
-            userChoice = Console.ReadLine()?.Trim();
-
-            if (MenuItems.ContainsKey(userChoice?.ToLower()))
+            //draw menuItems
+            Draw();
+            userChoice = Console.ReadLine()?.ToLower().Trim();
+            if (MenuItems.ContainsKey(userChoice))
             {
-                if (MenuItems[userChoice!.ToLower()].SubMenuToRun != null)
+                string? result = null;
+                if (MenuItems[userChoice].MethodToRun != null)
                 {
-                    var result = "";
-                    if (menuLevel == EMenuLevel.First)
-                    {
-                         result = MenuItems[userChoice!.ToLower()].SubMenuToRun!(EMenuLevel.Second);
-                    }
-                    else
-                    {
-                        result = MenuItems[userChoice!.ToLower()].SubMenuToRun!(EMenuLevel.Other);
-                    }
-                    // TODO:  handle result - b,x,r
-                    
+                    result = MenuItems[userChoice].MethodToRun!();
                 }
-                else if (MenuItems[userChoice!.ToLower()].MethodToRun != null)
+
+                if (userChoice == ShortcutBack)
                 {
-                    var result = MenuItems[userChoice!.ToLower()].MethodToRun!();
-                    if (result?.ToLower() == "x")
-                    {
-                        userChoice = "x";
-                    }
+                    menuDone = true;
+                }
+
+                if (userChoice == ShortcutExit || result == ShortcutExit)
+                {
+                    //if result != null -> uses result, else uses userChoice
+                    userChoice = result ?? userChoice;
+                    menuDone = true;
+                }
+
+                if ((userChoice == ShortcutReturnToMain || result == ShortcutReturnToMain) && _level != EMenuLevel.First)
+                {
+                    //if result != null -> uses result, else uses userChoice
+                    userChoice = result ?? userChoice;
+                    menuDone = true;
                 }
             }
-            else if (!ReservedShortcuts.Contains(userChoice?.ToLower()))
+            else 
             {
                 Console.WriteLine("Undefined shortcut....");
             }
 
             Console.WriteLine();
-        } while (!ReservedShortcuts.Contains(userChoice));
-
+            //menuSystem stops running if menuDone = true
+        } while (menuDone == false);
+        
         return userChoice;
     }
 }

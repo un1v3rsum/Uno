@@ -1,8 +1,9 @@
 ﻿using UnoEngine;
 using MenuSystem;
-
+//define gameEngine
 var game = new GameEngine();
 
+//method for setting playerCount
 string? SetPlayerCount()
 {
     Console.Write("Player count?");
@@ -18,54 +19,48 @@ string? SetPlayerCount()
             PlayerType = EPlayerType.Human,
         });
     }
-    return null;
+   //TODO only allow numbers to be inserted
+    
+    return "b";
 }
-
+//method for picking New Game
 string? runNewGameMenu()
 {
-    var startNewGameMenu = new Menu("New Game", new List<MenuItem>()
+    //constructing new menu with items
+    var startNewGameMenu = new Menu(EMenuLevel.Second, "New Game", new List<MenuItem>()
         {
-            new MenuItem()
-            {
-                Shortcut = "c",
-                MenuLabel = "Player count: " + game.Players.Count,
-                MethodToRun = SetPlayerCount
-            },
-            new MenuItem()
-            {
-                Shortcut = "t",
-                MenuLabel = "Player names and types: ",
-            },
-            new MenuItem()
-            {
-                Shortcut = "s",
-                MenuLabel = "Start the game of UNO",
-            },
+            new MenuItem(
+                "Player count: "+game.Players.Count, 
+                "c", 
+                SetPlayerCount),
+            new MenuItem(
+                "Players names and types: ", 
+                "t", 
+                null),
+            new MenuItem(
+                "Start the game of UNO", 
+                "s", 
+                null),
         }
     );
-    
-    return startNewGameMenu.Run(EMenuLevel.Second);
+    //returns and activates new menu
+    return startNewGameMenu.Run();
 }
-
-var mainMenu = new Menu(">> UNO <<", new List<MenuItem>()
+//Initial mainMenu 
+var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
 {
-    new MenuItem()
-    {
-        Shortcut = "s",
-        MenuLabel = "Start a new game",
-        MethodToRun = runNewGameMenu
-    },
-    new MenuItem()
-    {
-        Shortcut = "l",
-        MenuLabel = "Load game",
-    },
-    new MenuItem()
-    {
-        Shortcut = "o",
-        MenuLabel = "Options",
-    },
+    new MenuItem(
+        "Start a new game", 
+        "s", 
+        runNewGameMenu),
+    new MenuItem(
+        "Load game", 
+        "l", 
+        null),
+    new MenuItem(
+        "Options", 
+        "o", 
+        null),
 });
-
-
+//run the consoleApp 
 var userChoice = mainMenu.Run();
