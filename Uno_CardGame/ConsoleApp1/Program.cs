@@ -21,7 +21,7 @@ string? SetPlayerCount()
     }
    //TODO only allow numbers to be inserted
     
-    return "b";
+    return null;
 }
 //method for picking New Game
 string? runNewGameMenu()

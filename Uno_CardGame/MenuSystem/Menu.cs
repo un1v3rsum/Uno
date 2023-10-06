@@ -14,8 +14,7 @@ public class Menu
     private readonly MenuItem _menuItemExit = new MenuItem("Exit", ShortcutExit, null);
     private readonly MenuItem _menuItemBack = new MenuItem("Back", ShortcutBack, null);
     private readonly MenuItem _menuItemReturnToMain = new MenuItem("Return to Main",  ShortcutReturnToMain, null);
-
-
+    
     public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
         _level = level;
@@ -32,10 +31,10 @@ public class Menu
             MenuItems.Add(menuItem.Shortcut, menuItem);
             
         }
-        //BACK not seen in the first level
+        //BACK not shown in the first level
         if (_level != EMenuLevel.First)
             MenuItems.Add(ShortcutBack, _menuItemBack);
-        //RETURN TO MAIN only seen in lower levels (not 1. & 2.)
+        //RETURN TO MAIN only shown in lower levels (not 1. & 2.)
         if (_level == EMenuLevel.Other)
             MenuItems.Add(ShortcutReturnToMain, _menuItemReturnToMain);
         //EXIT seen in every level
@@ -67,7 +66,7 @@ public class Menu
         //boolean for do-while loop
         var menuDone = false;
         var userChoice = "";
-        do
+        do//loop
         {
             //draw menuItems
             Draw();
