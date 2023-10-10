@@ -1,3 +1,7 @@
+
+
+using Domain;
+
 namespace MenuSystem;
 //menu class
 public class Menu
@@ -43,6 +47,11 @@ public class Menu
     //method for drawing the menusystem
     private void Draw()
     {
+        //Console.WriteLine("size of deck: "+ CardDeck.Cards.Count); //*check for the deckSize befor shuffle
+        //foreach (var card in CardDeck.Cards){Console.WriteLine(card.CardColor + ""+ card.CardValue);}//*SHOW CARDS
+        //CardDeck.Shuffle();//*SHUFFLE DECK
+        //foreach (var card in CardDeck.Cards){Console.WriteLine(card.CardColor + ""+ card.CardValue);}//*SHOW CARDS
+        //Console.WriteLine("size of deck: "+ CardDeck.Cards.Count); //*check for the deckSize after shuffle
         if (!string.IsNullOrWhiteSpace(Title))
         {
             Console.WriteLine(Title);
