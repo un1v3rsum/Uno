@@ -1,6 +1,10 @@
+using UnoEngine;
+
 namespace Domain;
 
 public class GameCard
-{//TODO 
-    
+{
+    public ECardColor CardColor { get; set; }
+    public ECardValues CardValue { get; set; }
+    public int score { get; set; }
 }

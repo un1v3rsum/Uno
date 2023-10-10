@@ -1,5 +1,5 @@
 namespace UnoEngine;
-//enum playertype class: ATM only two types
+//enum playertypes
 public enum EPlayerType
 {
     Human, 

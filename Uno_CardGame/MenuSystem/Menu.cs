@@ -98,7 +98,7 @@ public class Menu
                     menuDone = true;
                 }
             }
-            else 
+            else //*error*
             {
                 Console.WriteLine("Undefined shortcut....");
             }

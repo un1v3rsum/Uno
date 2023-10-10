@@ -1,7 +1,7 @@
 namespace UnoEngine;
-
+//enum card colors
 public enum ECardColor
-{//TODO 
+{
     Red, 
     Yellow, 
     Green, 
