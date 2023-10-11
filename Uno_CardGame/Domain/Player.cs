@@ -1,5 +1,4 @@
 using Domain;
-
 namespace UnoEngine;
 //player class with a string (nickname), enum (playertype) & list of gamecards (playerHand) attributes
 public class Player

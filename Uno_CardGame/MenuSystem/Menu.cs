@@ -1,7 +1,3 @@
-
-
-using Domain;
-
 namespace MenuSystem;
 //menu class
 public class Menu

@@ -1,5 +1,5 @@
 ﻿namespace MenuSystem;
-//menuitem class with 2 string attributes (label & shortcutkey) and 2 methods (delegates)
+//menuitem class with 2 string attributes (label & shortcutkey) and one method 
 public class MenuItem
 {
     public string MenuLabel { get; set; } = default!;

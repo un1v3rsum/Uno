@@ -1,7 +1,6 @@
 ﻿using Domain;
-
 namespace UnoEngine;
-//gameengine class, if constructed, creates a list with players: ATM 1 human + 1 AI
+//gameEngine class, if constructed, creates a list with players: ATM 1 human + 1 AI
 public class GameEngine
 {
     public List<GameCard> DiscardedCards { get; set; }
