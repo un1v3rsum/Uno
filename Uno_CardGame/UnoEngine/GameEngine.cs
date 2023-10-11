@@ -4,7 +4,7 @@ namespace UnoEngine;
 public class GameEngine
 {
     public List<GameCard> DiscardedCards { get; set; }
-    public CardDeck CardDeck { get; set; } = new CardDeck();
+    public CardDeck CardDeck { get; set; } = new CardDeck(1);
     public int ActivePlayerNo { get; set; } = 0;//TODO: how to choose the starter?
     public List<Player> Players { get; set; } = new List<Player>()
     {

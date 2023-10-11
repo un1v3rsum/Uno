@@ -4,10 +4,10 @@ public class MenuItem
 {
     public string MenuLabel { get; set; } = default!;
     public string Shortcut { get; set; } = default!;
-    public Func<string?,string?>? MethodToRun { get; set; }
+    public Func<string>? MethodToRun { get; set; }
     
     //menuItem constructor
-    public MenuItem(string title, string shortcut, Func<string?,string?>? methodToRun)
+    public MenuItem(string title, string shortcut, Func<string>? methodToRun)
     {
         MenuLabel = title;
         Shortcut = shortcut;

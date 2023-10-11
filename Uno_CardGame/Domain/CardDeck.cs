@@ -6,16 +6,23 @@ public class CardDeck
 {
     //list of gamecards as an attribute
     public static List<GameCard> Cards { get; set; } = null!;
+
+    public int Size { get; set; }
     //cardDeck constructor
     //2018 rule changes - deck of 112 cards
     //one Zero card for each color (4)
     //two number cards for each color (2 * 9 * 4 = 72)
     //two of every action card (skip, reverse, drawTwo) for each color (2 * 3 * 4 = 24)
     //four wild cards, four drawFourWild cards, three wildCustomizable and one wildShuffleHands card (4 + 4 + 3 + 1 = 12)
-    public CardDeck()
-    {   //create a list of gamecards
+    public CardDeck(int size)
+    {   //define the amount of cardPacks in deck
+        Size = size;
+        //create a list of gamecards
         Cards = new List<GameCard>();
-        //for each defined card color
+        //for loop until the amount of cardPacks are added to deck
+        for (int j = 0; j < size; j++)
+        {
+            //for each defined card color
         foreach (ECardColor color in Enum.GetValues(typeof(ECardColor)))
         {//if it is a defined color card and not a wild card
             if (color != ECardColor.Wild)
@@ -113,6 +120,8 @@ public class CardDeck
                 });
             }
         }
+        }
+        
     }
     //deck shuffling method (Knuth-Fisher-Yates)
     public static void Shuffle()

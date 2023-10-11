@@ -1,9 +1,10 @@
-﻿using UnoEngine;
+﻿using Domain;
+using UnoEngine;
 using MenuSystem;
 //define gameEngine
 var game = new GameEngine();
 //method for setting playerCount 
-string setPlayerCount(string? i1)
+string setPlayerCount()
 {
     Console.WriteLine("Game can have 2 - 10 players.");
     bool correctCount = false;
@@ -28,16 +29,16 @@ string setPlayerCount(string? i1)
     {
         game.Players.Add(new Player()
         {
-            NickName   = "Human " + i,
+            NickName   = "Human " + (i+1),
             PlayerType = EPlayerType.Human,
         });
     }
     return null;
 }
 //method to change the name or type of the player
-string? changePlayerNameAndType(string? i)
+string changePlayerNameAndType()
 {
-    var playerMenu = new Menu(EMenuLevel.Other, game.Players[int.Parse(i)].NickName, new List<MenuItem>()
+    var playerMenu = new Menu(EMenuLevel.Other, game.Players[int.Parse("1")].NickName, new List<MenuItem>()
         {
             new MenuItem(
                 "Change NickName", 
@@ -46,7 +47,7 @@ string? changePlayerNameAndType(string? i)
             new MenuItem(
                 "Change PlayerType", 
                 "t", 
-                showPlayersNamesAndTypes),
+                null),
         }
     );
     
@@ -54,26 +55,98 @@ string? changePlayerNameAndType(string? i)
     return playerMenu.Run();;
     return null;
 }
+
+string? editPlayerNamesAndTypes()
+{
+    for (int i = 0; i < game.Players.Count; i++)
+    {//TODO namecheck
+        bool realType = false;
+        Console.Write("Enter " + (i+1) + ". player name: ");
+        game.Players[i].NickName = Console.ReadLine();
+        do
+        { 
+            Console.Write("Is player " + (i+1) + " human (press: h) or AI (press: a)?: ");
+            var answer = Console.ReadLine();
+            if (answer != "h" && answer != "a")
+            {
+                Console.WriteLine("ERROR! Press the letter 'h' or 'a' on your keyboard.");
+            }
+            switch (answer)
+            {
+                case "h":
+                    game.Players[i].PlayerType = EPlayerType.Human;
+                    realType = true;
+                    break;
+                case "a":
+                    game.Players[i].PlayerType = EPlayerType.AI;
+                    realType = true;
+                    break;
+            }
+        } while (realType == false);
+    }
+
+    return null;
+}
 //method to show players names and types
-string? showPlayersNamesAndTypes(string? i1)
+string? showPlayersNamesAndTypes()
 {
     var playersAsMenuItems = new List<MenuItem>();
     for (int i = 0; i < game.Players.Count; i++)
     {
-        var strNr = i.ToString();
         playersAsMenuItems.Add(
             new MenuItem(
-                game.Players[i].NickName,
-                strNr,
-                changePlayerNameAndType(strNr)//PROBLEEM!!
+                game.Players[i].NickName + " " + game.Players[i].PlayerType,
+                (i+1).ToString(),
+                null//TODO kuidas kasutada ühe sisendparameetriga meetodit !!
             ));
     }
-    var playersMenu = new Menu(EMenuLevel.Other, "Players List", playersAsMenuItems);
+    playersAsMenuItems.Add(
+        new MenuItem(
+            "EDIT players",
+            "e",
+            editPlayerNamesAndTypes
+            ));
     
+    var playersMenu = new Menu(EMenuLevel.Other, "Players List", playersAsMenuItems);
     return playersMenu.Run();
 }
+
+string? setDeckSize()//TODO
+{
+    Console.WriteLine("Max 3 packs of cards can be used.");
+    bool correctCount = false;
+    do
+    {
+        Console.Write("Insert nr of packs:"); 
+        var countStr = Console.ReadLine();
+        if (int.Parse(countStr) is < 1 or > 3)
+        {
+            Console.WriteLine("ERROR! You have to insert an integer between 2 - 10.");
+        }
+        else
+        {
+            game.CardDeck.Size = int.Parse(countStr);
+            correctCount = true;
+        }
+    } while (correctCount == false);
+    return null;
+}
+string? runOptionsMenu()
+{
+    //constructing new menu with items
+    var optionsGameMenu = new Menu(EMenuLevel.Second, "Options", new List<MenuItem>()
+        {
+            new MenuItem(
+                "Cards used: "+game.CardDeck.Size, 
+                "p", 
+                setDeckSize),
+        }
+    );
+    //returns and activates new menu
+    return optionsGameMenu.Run();
+}
 //method for picking New Game
-string? runNewGameMenu(string? i)
+string? runNewGameMenu()
 {
     //constructing new menu with items
     var startNewGameMenu = new Menu(EMenuLevel.Second, "New Game", new List<MenuItem>()
@@ -109,7 +182,7 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
     new MenuItem(
         "Options", 
         "o", 
-        null),
+        runOptionsMenu),
 });
 //run the consoleApp 
-var userChoice = mainMenu.Run();
+mainMenu.Run();
