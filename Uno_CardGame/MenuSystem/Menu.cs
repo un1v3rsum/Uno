@@ -81,7 +81,7 @@ public class Menu
                 string? result = null;
                 if (MenuItems[userChoice].MethodToRun != null)
                 {
-                    result = MenuItems[userChoice].MethodToRun!();
+                    result = MenuItems[userChoice].MethodToRun!(null!);
                 }
 
                 if (userChoice == ShortcutBack)

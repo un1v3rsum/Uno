@@ -3,7 +3,7 @@ using MenuSystem;
 //define gameEngine
 var game = new GameEngine();
 //method for setting playerCount 
-string? setPlayerCount()
+string setPlayerCount(string? i1)
 {
     Console.WriteLine("Game can have 2 - 10 players.");
     bool correctCount = false;
@@ -34,25 +34,46 @@ string? setPlayerCount()
     }
     return null;
 }
-//method to change players names and types
-string? changePlayerNameAndType()
+//method to change the name or type of the player
+string? changePlayerNameAndType(string? i)
+{
+    var playerMenu = new Menu(EMenuLevel.Other, game.Players[int.Parse(i)].NickName, new List<MenuItem>()
+        {
+            new MenuItem(
+                "Change NickName", 
+                "n", 
+                null),
+            new MenuItem(
+                "Change PlayerType", 
+                "t", 
+                showPlayersNamesAndTypes),
+        }
+    );
+    
+    //returns and activates new menu
+    return playerMenu.Run();;
+    return null;
+}
+//method to show players names and types
+string? showPlayersNamesAndTypes(string? i1)
 {
     var playersAsMenuItems = new List<MenuItem>();
     for (int i = 0; i < game.Players.Count; i++)
     {
+        var strNr = i.ToString();
         playersAsMenuItems.Add(
             new MenuItem(
                 game.Players[i].NickName,
-                i.ToString(),
-                null
+                strNr,
+                changePlayerNameAndType(strNr)//PROBLEEM!!
             ));
     }
     var playersMenu = new Menu(EMenuLevel.Other, "Players List", playersAsMenuItems);
     
-    return playersMenu.Run();;
+    return playersMenu.Run();
 }
 //method for picking New Game
-string? runNewGameMenu()
+string? runNewGameMenu(string? i)
 {
     //constructing new menu with items
     var startNewGameMenu = new Menu(EMenuLevel.Second, "New Game", new List<MenuItem>()
@@ -62,9 +83,9 @@ string? runNewGameMenu()
                 "c", 
                 setPlayerCount),
             new MenuItem(
-                "Players names and types: ", 
+                "Show players", 
                 "t", 
-                changePlayerNameAndType),
+                showPlayersNamesAndTypes),
             new MenuItem(
                 "Start the game of UNO", 
                 "s", 
