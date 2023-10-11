@@ -2,7 +2,7 @@ namespace MenuSystem;
 //menu class
 public class Menu
 {
-    private readonly EMenuLevel _level;
+    private readonly EMenuLevel Level;
     public string? Title { get; set; }
     //container for menuItems
     public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
@@ -11,13 +11,13 @@ public class Menu
     private const string ShortcutBack = "b";
     private const string ShortcutReturnToMain = "r";
     //private menuItems, not accessible by the player 
-    private readonly MenuItem _menuItemExit = new MenuItem("Exit", ShortcutExit, null);
-    private readonly MenuItem _menuItemBack = new MenuItem("Back", ShortcutBack, null);
-    private readonly MenuItem _menuItemReturnToMain = new MenuItem("Return to Main",  ShortcutReturnToMain, null);
+    private readonly MenuItem menuItemExit = new MenuItem("Exit", ShortcutExit, null);
+    private readonly MenuItem menuItemBack = new MenuItem("Back", ShortcutBack, null);
+    private readonly MenuItem menuItemReturnToMain = new MenuItem("Return to Main",  ShortcutReturnToMain, null);
     
     public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
-        _level = level;
+        Level = level;
         Title = title;
         foreach (var menuItem in menuItems)
         {   
@@ -32,13 +32,13 @@ public class Menu
             
         }
         //BACK not shown in the first level
-        if (_level != EMenuLevel.First)
-            MenuItems.Add(ShortcutBack, _menuItemBack);
+        if (level != EMenuLevel.First)
+            MenuItems.Add(ShortcutBack, menuItemBack);
         //RETURN TO MAIN only shown in lower levels (not 1. & 2.)
-        if (_level == EMenuLevel.Other)
-            MenuItems.Add(ShortcutReturnToMain, _menuItemReturnToMain);
+        if (level == EMenuLevel.Other)
+            MenuItems.Add(ShortcutReturnToMain, menuItemReturnToMain);
         //EXIT seen in every level
-        MenuItems.Add(ShortcutExit, _menuItemExit);
+        MenuItems.Add(ShortcutExit, menuItemExit);
     }
     //method for drawing the menusystem
     private void Draw()
@@ -96,18 +96,18 @@ public class Menu
                     menuDone = true;
                 }
 
-                if ((userChoice == ShortcutReturnToMain || result == ShortcutReturnToMain) && _level != EMenuLevel.First)
+                if ((userChoice == ShortcutReturnToMain || result == ShortcutReturnToMain) && Level != EMenuLevel.First)
                 {
                     //if result != null -> uses result, else uses userChoice
                     userChoice = result ?? userChoice;
                     menuDone = true;
                 }
+                
             }
             else //*error*
             {
                 Console.WriteLine("Undefined shortcut....");
             }
-
             Console.WriteLine();
             //menuSystem stops running if menuDone = true
         } while (menuDone == false);

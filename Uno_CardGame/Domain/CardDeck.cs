@@ -114,7 +114,7 @@ public class CardDeck
             }
         }
     }
-    //deck shuffling method
+    //deck shuffling method (Knuth-Fisher-Yates)
     public static void Shuffle()
     {
         Random r = new Random();//new random engine

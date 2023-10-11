@@ -1,16 +1,28 @@
-﻿
-using Domain;
-using UnoEngine;
+﻿using UnoEngine;
 using MenuSystem;
 //define gameEngine
 var game = new GameEngine();
-//method for setting playerCount
-string? SetPlayerCount()
+//method for setting playerCount 
+string? setPlayerCount()
 {
-    Console.Write("Player count?");
-    var countStr = Console.ReadLine()?.Trim();
-    var count = int.Parse(countStr);
-
+    Console.WriteLine("Game can have 2 - 10 players.");
+    bool correctCount = false;
+    int count;
+    do
+    {
+        Console.Write("Insert player count:"); 
+        var countStr = Console.ReadLine();
+        int.TryParse(countStr,out count);
+        if (count is < 2 or > 10)
+        {
+            Console.WriteLine("ERROR! You have to insert an integer between 2 - 10.");
+        }
+        else
+        {
+            correctCount = true;
+        }
+    } while (correctCount == false);
+    //create new list of Players, initially all human
     game.Players = new List<Player>();
     for (int i = 0; i < count; i++)
     {
@@ -20,9 +32,24 @@ string? SetPlayerCount()
             PlayerType = EPlayerType.Human,
         });
     }
-   //TODO only allow numbers to be inserted
-    
     return null;
+}
+//method to change players names and types
+string? changePlayerNameAndType()
+{
+    var playersAsMenuItems = new List<MenuItem>();
+    for (int i = 0; i < game.Players.Count; i++)
+    {
+        playersAsMenuItems.Add(
+            new MenuItem(
+                game.Players[i].NickName,
+                i.ToString(),
+                null
+            ));
+    }
+    var playersMenu = new Menu(EMenuLevel.Other, "Players List", playersAsMenuItems);
+    
+    return playersMenu.Run();;
 }
 //method for picking New Game
 string? runNewGameMenu()
@@ -33,11 +60,11 @@ string? runNewGameMenu()
             new MenuItem(
                 "Player count: "+game.Players.Count, 
                 "c", 
-                SetPlayerCount),
+                setPlayerCount),
             new MenuItem(
                 "Players names and types: ", 
                 "t", 
-                null),
+                changePlayerNameAndType),
             new MenuItem(
                 "Start the game of UNO", 
                 "s", 
