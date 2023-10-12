@@ -83,7 +83,6 @@ public class Menu
                 {
                     result = MenuItems[userChoice].MethodToRun!();
                 }
-                
                 if (userChoice == ShortcutBack)
                 {
                     menuDone = true;

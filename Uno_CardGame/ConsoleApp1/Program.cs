@@ -59,7 +59,7 @@ string changePlayerNameAndType()
 string? editPlayerNamesAndTypes()
 {
     for (int i = 0; i < game.Players.Count; i++)
-    {//TODO namecheck
+    {
         bool realType = false;
         Console.Write("Enter " + (i+1) + ". player name: ");
         game.Players[i].NickName = Console.ReadLine();
@@ -97,7 +97,23 @@ string? showPlayersNamesAndTypes()
             new MenuItem(
                 game.Players[i].NickName + " " + game.Players[i].PlayerType,
                 (i+1).ToString(),
-                null//TODO kuidas kasutada ühe sisendparameetriga meetodit !!
+                null
+                //TODO kuidas kasutada ühe sisendparameetriga meetodit !! 
+                //tahaks, et methodToRun oleks showPlayer(var i), nii et saaks järgmise menuLvli avada Menu klassina,
+                //kus pealkirjaks on avatud mängija nimi ja oleks üks menuItem, millega saaks muuta nime ja tüüpi + "b","r","x"
+                //
+                // showPlayer(var i)
+                // {
+                //      var playerMenu = new Menu(level:EMenuLevel.Other, title:game.Players[i].NickName, new List<MenuItem>()
+                //          {
+                //          new MenuItem(
+                //              title: "edit name and type",
+                //              shortcut: "e",
+                //              method: editNameAndType),
+                //          }
+                //      );
+                // return something
+                // }
             ));
     }
     playersAsMenuItems.Add(
@@ -119,21 +135,22 @@ string? setDeckSize()//TODO
     {
         Console.Write("Insert nr of packs:"); 
         var countStr = Console.ReadLine();
-        if (int.Parse(countStr) is < 1 or > 3)
-        {
-            Console.WriteLine("ERROR! You have to insert an integer between 2 - 10.");
-        }
-        else
+        if (countStr is "1" or "2" or "3")
         {
             game.CardDeck.Size = int.Parse(countStr);
             correctCount = true;
         }
+        else
+        {
+            Console.WriteLine("ERROR! You have to insert an integer between 1 - 3.");
+        }
     } while (correctCount == false);
     return null;
 }
+
 string? runOptionsMenu()
 {
-    //constructing new menu with items
+    //constructing new optionsMenu with items
     var optionsGameMenu = new Menu(EMenuLevel.Second, "Options", new List<MenuItem>()
         {
             new MenuItem(
