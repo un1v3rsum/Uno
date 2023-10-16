@@ -34,29 +34,10 @@ string setPlayerCount()
         {
             NickName   = "Human " + (i+1),
             PlayerType = EPlayerType.Human,
-            Position = (i+1).ToString()
+            Position = i+1
         });
     }
-    return null;
-}
-//method to change the name or type of the player
-string changePlayerNameAndType()
-{
-    var playerMenu = new Menu(EMenuLevel.Other, game.State.Players[int.Parse("1")].NickName, new List<MenuItem>()
-        {
-            new MenuItem(
-                "Change NickName", 
-                "n", 
-                null),
-            new MenuItem(
-                "Change PlayerType", 
-                "t", 
-                null),
-        }
-    );
-    
-    //returns and activates new menu
-    return playerMenu.Run();;
+    game.UpdateGame();
     return null;
 }
 
@@ -88,7 +69,7 @@ string? editPlayerNamesAndTypes()
             }
         } while (realType == false);
     }
-
+    game.UpdateGame();
     return null;
 }
 
@@ -150,6 +131,7 @@ string? setDeckSize()//TODO
             Console.WriteLine("ERROR! You have to insert an integer between 1 - 3.");
         }
     } while (correctCount == false);
+    game.UpdateGame();
     return null;
 }
 
@@ -201,16 +183,19 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
     new MenuItem(
         "Load game", 
         "l", 
-        null),
+        loadGame),
     new MenuItem(
         "Options", 
         "o", 
         runOptionsMenu),
-    new MenuItem(
-        "Save game", 
-        "a", 
-        null),
 });
+
+string loadGame()
+{
+    game.State = game.LoadGame();
+    return null;
+}
 //run the consoleApp 
 mainMenu.Run();
 game.SaveGame();
+

@@ -5,9 +5,8 @@ namespace Domain;
 public class CardDeck
 {
     //list of gamecards as an attribute
-    public static List<GameCard> Cards { get; set; } = null!;
-
-    public int Size { get; set; }
+    public List<GameCard> Cards { get; set; }
+    public int Size { get; set; } = 1;
     //cardDeck constructor
     //2018 rule changes - deck of 112 cards
     //one Zero card for each color (4)
@@ -123,7 +122,7 @@ public class CardDeck
         }
     }
     //deck shuffling method (Knuth-Fisher-Yates)
-    public static void Shuffle()
+    public void Shuffle()
     {
         Random r = new Random();//new random engine
         List<GameCard> unShuffledCards = Cards;
