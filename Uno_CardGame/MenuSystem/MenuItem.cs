@@ -4,7 +4,10 @@ public class MenuItem
 {
     public string MenuLabel { get; set; } = default!;
     public string Shortcut { get; set; } = default!;
-    public Func<string>? MethodToRun { get; set; }
+    public Func<string?>? MethodToRun { get; set; }
+    
+    
+    
     //public Func<string,string>? MethodToRun { get; set; } //tahaks, et tulevikus määratud meetod võtaks sisendparameetri,
     //kuid selline func ei tööta
     

@@ -121,7 +121,6 @@ public class CardDeck
             }
         }
         }
-        
     }
     //deck shuffling method (Knuth-Fisher-Yates)
     public static void Shuffle()
@@ -151,9 +150,8 @@ public class CardDeck
         Cards.RemoveAll(cards => cardsDrawn.Contains(cards));
         return cardsDrawn;
     }
-
-    //void Reset()
-    //{
-        //ReceivedCards = new List<GameCard>();
-    //}
+    void Reset()
+    {
+        new CardDeck(Size);
+    }
 }

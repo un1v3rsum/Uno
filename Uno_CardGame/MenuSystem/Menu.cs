@@ -101,7 +101,6 @@ public class Menu
                     userChoice = result ?? userChoice;
                     menuDone = true;
                 }
-                
             }
             else //*error*
             {
@@ -110,7 +109,6 @@ public class Menu
             Console.WriteLine();
             //menuSystem stops running if menuDone = true
         } while (menuDone == false);
-        
         return userChoice;
     }
 }

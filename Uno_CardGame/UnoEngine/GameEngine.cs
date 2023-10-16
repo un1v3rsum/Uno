@@ -1,23 +1,47 @@
-﻿using Domain;
+﻿using DAL;
+using Domain;
 namespace UnoEngine;
-//gameEngine class, if constructed, creates a list with players: ATM 1 human + 1 AI
-public class GameEngine
-{
-    public List<GameCard> DiscardedCards { get; set; }
-    public CardDeck CardDeck { get; set; } = new CardDeck(1);
-    public int ActivePlayerNo { get; set; } = 0;//TODO: how to choose the starter?
-    public List<Player> Players { get; set; } = new List<Player>()
-    {
-        new Player()
-        {
-            NickName = "Human",
-            PlayerType = EPlayerType.Human
-        },
-        new Player()
-        {
-            NickName = "AI",
-            PlayerType = EPlayerType.AI
-        },
-    };
 
+public class GameEngine<TKey>
+{
+    public IGameRepository<TKey> GameRepository { get; set; }
+    public GameState State { get; set; } = new GameState();
+    private const int InitialHandSize = 7;
+    private const int InitialDeckSize = 1;
+    public GameEngine(IGameRepository<TKey> repository)
+    {
+        GameRepository = repository;
+        InitializeFullDeck();
+        InitializePlayers();
+    }
+
+    private void InitializeFullDeck()
+    {
+        new CardDeck(InitialDeckSize);
+        CardDeck.Shuffle();
+    }
+    
+    private void InitializePlayers()
+    {
+        State.Players = new List<Player>()
+        {
+            new Player()
+            {
+                NickName = "Puny human",
+                PlayerType = EPlayerType.Human
+            },
+            new Player()
+            {
+                NickName = "Mighty AI",
+                PlayerType = EPlayerType.AI
+            },
+        };
+    }
+
+    public void SaveGame()
+    {
+        GameRepository.SaveGame(null, State);
+    }
+
+    
 }

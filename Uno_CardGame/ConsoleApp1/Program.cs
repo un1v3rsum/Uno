@@ -1,8 +1,11 @@
-﻿using Domain;
+﻿using DAL;
+using Domain;
 using UnoEngine;
 using MenuSystem;
+//define gameRepository
+var gameRepository = new GameRepositoryFileSystem();
 //define gameEngine
-var game = new GameEngine();
+var game = new GameEngine<string>(gameRepository);
 //method for setting playerCount 
 string setPlayerCount()
 {
@@ -24,13 +27,14 @@ string setPlayerCount()
         }
     } while (correctCount == false);
     //create new list of Players, initially all human
-    game.Players = new List<Player>();
+    game.State.Players = new List<Player>();
     for (int i = 0; i < count; i++)
     {
-        game.Players.Add(new Player()
+        game.State.Players.Add(new Player()
         {
             NickName   = "Human " + (i+1),
             PlayerType = EPlayerType.Human,
+            Position = (i+1).ToString()
         });
     }
     return null;
@@ -38,7 +42,7 @@ string setPlayerCount()
 //method to change the name or type of the player
 string changePlayerNameAndType()
 {
-    var playerMenu = new Menu(EMenuLevel.Other, game.Players[int.Parse("1")].NickName, new List<MenuItem>()
+    var playerMenu = new Menu(EMenuLevel.Other, game.State.Players[int.Parse("1")].NickName, new List<MenuItem>()
         {
             new MenuItem(
                 "Change NickName", 
@@ -58,11 +62,11 @@ string changePlayerNameAndType()
 
 string? editPlayerNamesAndTypes()
 {
-    for (int i = 0; i < game.Players.Count; i++)
+    for (int i = 0; i < game.State.Players.Count; i++)
     {
         bool realType = false;
         Console.Write("Enter " + (i+1) + ". player name: ");
-        game.Players[i].NickName = Console.ReadLine();
+        game.State.Players[i].NickName = Console.ReadLine();
         do
         { 
             Console.Write("Is player " + (i+1) + " human (press: h) or AI (press: a)?: ");
@@ -74,11 +78,11 @@ string? editPlayerNamesAndTypes()
             switch (answer)
             {
                 case "h":
-                    game.Players[i].PlayerType = EPlayerType.Human;
+                    game.State.Players[i].PlayerType = EPlayerType.Human;
                     realType = true;
                     break;
                 case "a":
-                    game.Players[i].PlayerType = EPlayerType.AI;
+                    game.State.Players[i].PlayerType = EPlayerType.AI;
                     realType = true;
                     break;
             }
@@ -87,15 +91,16 @@ string? editPlayerNamesAndTypes()
 
     return null;
 }
+
 //method to show players names and types
 string? showPlayersNamesAndTypes()
 {
     var playersAsMenuItems = new List<MenuItem>();
-    for (int i = 0; i < game.Players.Count; i++)
+    for (int i = 0; i < game.State.Players.Count; i++)
     {
         playersAsMenuItems.Add(
             new MenuItem(
-                game.Players[i].NickName + " " + game.Players[i].PlayerType,
+                game.State.Players[i].NickName + " " + game.State.Players[i].PlayerType,
                 (i+1).ToString(),
                 null
                 //TODO kuidas kasutada ühe sisendparameetriga meetodit !! 
@@ -137,7 +142,7 @@ string? setDeckSize()//TODO
         var countStr = Console.ReadLine();
         if (countStr is "1" or "2" or "3")
         {
-            game.CardDeck.Size = int.Parse(countStr);
+            game.State.CardDeck.Size = int.Parse(countStr);
             correctCount = true;
         }
         else
@@ -154,9 +159,10 @@ string? runOptionsMenu()
     var optionsGameMenu = new Menu(EMenuLevel.Second, "Options", new List<MenuItem>()
         {
             new MenuItem(
-                "Cards used: "+game.CardDeck.Size, 
+                "Cards used: "+game.State.CardDeck.Size, 
                 "p", 
-                setDeckSize),
+                setDeckSize
+                ),
         }
     );
     //returns and activates new menu
@@ -169,7 +175,7 @@ string? runNewGameMenu()
     var startNewGameMenu = new Menu(EMenuLevel.Second, "New Game", new List<MenuItem>()
         {
             new MenuItem(
-                "Player count: "+game.Players.Count, 
+                "Player count: "+game.State.Players.Count, 
                 "c", 
                 setPlayerCount),
             new MenuItem(
@@ -200,6 +206,11 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
         "Options", 
         "o", 
         runOptionsMenu),
+    new MenuItem(
+        "Save game", 
+        "a", 
+        null),
 });
 //run the consoleApp 
 mainMenu.Run();
+game.SaveGame();
