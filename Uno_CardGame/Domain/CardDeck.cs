@@ -4,18 +4,16 @@ namespace Domain;
 //cardDeck class
 public class CardDeck
 {
+    public ECardDeckType DeckType { get; set; } 
     //list of gamecards as an attribute
     public List<GameCard> Cards { get; set; }
-    public int Size { get; set; } = 1;
+    public int Size { get; set; } 
     //cardDeck constructor
-    //2018 rule changes - deck of 112 cards
-    //one Zero card for each color (4)
-    //two number cards for each color (2 * 9 * 4 = 72)
-    //two of every action card (skip, reverse, drawTwo) for each color (2 * 3 * 4 = 24)
-    //four wild cards, four drawFourWild cards, three wildCustomizable and one wildShuffleHands card (4 + 4 + 3 + 1 = 12)
-    public CardDeck(int size)
+    //108 cards for original deckType and 112 for modern deckType
+    public CardDeck(int size, ECardDeckType deckType)
     {   //define the amount of cardPacks in deck
         Size = size;
+        DeckType = deckType;
         //create a list of gamecards
         Cards = new List<GameCard>();
         //for loop until the amount of cardPacks are added to deck
@@ -101,22 +99,26 @@ public class CardDeck
                         Score = 50
                     });
                 }
-                for (int i = 1; i <= 3; i++)
-                {//add 3 drawFourWildCustomizable with a score of 40
+                //addition 4 wild cards if modern deckType
+                if (DeckType == ECardDeckType.Modern)
+                {
+                    for (int i = 1; i <= 3; i++)
+                    {//add 3 drawFourWildCustomizable with a score of 40
+                        Cards.Add(new GameCard()
+                        {
+                            CardColor = color,
+                            CardValue = ECardValues.WildCustomizable,
+                            Score = 40
+                        });
+                    }
+                    //and add 1 wildShuffleHands gamecard with a value of 40
                     Cards.Add(new GameCard()
                     {
                         CardColor = color,
-                        CardValue = ECardValues.WildCustomizable,
+                        CardValue = ECardValues.WildShuffleHands,
                         Score = 40
                     });
                 }
-                //and add 1 wildShuffleHands gamecard with a value of 40
-                Cards.Add(new GameCard()
-                {
-                    CardColor = color,
-                    CardValue = ECardValues.WildShuffleHands,
-                    Score = 40
-                });
             }
         }
         }
@@ -149,8 +151,5 @@ public class CardDeck
         Cards.RemoveAll(cards => cardsDrawn.Contains(cards));
         return cardsDrawn;
     }
-    void Reset()
-    {
-        new CardDeck(Size);
-    }
+
 }

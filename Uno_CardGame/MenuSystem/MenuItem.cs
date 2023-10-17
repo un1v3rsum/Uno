@@ -3,18 +3,16 @@
 public class MenuItem
 {
     public string MenuLabel { get; set; } = default!;
+    public Func<string>? MenuLabelFunction { get; set; }
     public string Shortcut { get; set; } = default!;
-    public Func<string?>? MethodToRun { get; set; }
+    public Func<string?>? MethodToRun { get; set; } 
     
-    
-    
-    //public Func<string,string>? MethodToRun { get; set; } //tahaks, et tulevikus määratud meetod võtaks sisendparameetri,
-    //kuid selline func ei tööta
     
     //menuItem constructor
-    public MenuItem(string title, string shortcut, Func<string>? methodToRun)
+    public MenuItem(string title, Func<string>? menuLabelFunction,string shortcut, Func<string>? methodToRun)
     {
         MenuLabel = title;
+        MenuLabelFunction = menuLabelFunction;
         Shortcut = shortcut;
         MethodToRun = methodToRun;
     }

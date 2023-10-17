@@ -11,9 +11,9 @@ public class Menu
     private const string ShortcutBack = "b";
     private const string ShortcutReturnToMain = "r";
     //private menuItems, not accessible by the player 
-    private readonly MenuItem menuItemExit = new MenuItem("Exit", ShortcutExit, null);
-    private readonly MenuItem menuItemBack = new MenuItem("Back", ShortcutBack, null);
-    private readonly MenuItem menuItemReturnToMain = new MenuItem("Return to Main",  ShortcutReturnToMain, null);
+    private readonly MenuItem menuItemExit = new MenuItem("Exit",null, ShortcutExit, null);
+    private readonly MenuItem menuItemBack = new MenuItem("Back",null, ShortcutBack, null);
+    private readonly MenuItem menuItemReturnToMain = new MenuItem("Return to Main", null, ShortcutReturnToMain, null);
     
     public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
@@ -43,11 +43,6 @@ public class Menu
     //method for drawing the menusystem
     private void Draw()
     {
-        //Console.WriteLine("size of deck: "+ CardDeck.Cards.Count); //*check for the deckSize befor shuffle
-        //foreach (var card in CardDeck.Cards){Console.WriteLine(card.CardColor + ""+ card.CardValue);}//*SHOW CARDS
-        //CardDeck.Shuffle();//*SHUFFLE DECK
-        //foreach (var card in CardDeck.Cards){Console.WriteLine(card.CardColor + ""+ card.CardValue);}//*SHOW CARDS
-        //Console.WriteLine("size of deck: "+ CardDeck.Cards.Count); //*check for the deckSize after shuffle
         if (!string.IsNullOrWhiteSpace(Title))
         {
             Console.WriteLine(Title);
@@ -58,7 +53,12 @@ public class Menu
         {
             Console.Write(menuItem.Key);
             Console.Write(") ");
-            Console.WriteLine(menuItem.Value.MenuLabel);
+            //if menuLabel has a function
+            Console.WriteLine(menuItem.Value.MenuLabelFunction != null
+                //then execute the function
+                ? menuItem.Value.MenuLabelFunction()
+                //otherwise show menulabel
+                : menuItem.Value.MenuLabel);
         }
         Console.WriteLine(MenuSeparator);
         Console.Write("Your choice:");

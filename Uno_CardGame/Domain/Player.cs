@@ -1,5 +1,6 @@
 using Domain;
 namespace UnoEngine;
+
 //player class with a string (nickname), enum (playertype), int (position) & list of gamecards (playerHand) attributes
 public class Player
 {
@@ -7,5 +8,9 @@ public class Player
     public EPlayerType PlayerType { get; set; }
     //starting order in the game
     public int Position { get; set; }
-    public List<GameCard> PlayerHand { get; set; } = new List<GameCard>();
+    public List<GameCard> PlayerHand { get; set; }
+    public override string ToString()
+    {
+        return NickName + " " + "(" + PlayerType.ToString() + ")";
+    }
 }

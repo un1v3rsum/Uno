@@ -1,11 +1,18 @@
-﻿using DAL;
+﻿using System.Text;
+using DAL;
 using Domain;
 using UnoEngine;
 using MenuSystem;
+using UnoConsoleUI;
+
+//encoding for emoji output
+Console.OutputEncoding = Encoding.UTF8;
 //define gameRepository
 var gameRepository = new GameRepositoryFileSystem();
 //define gameEngine
 var game = new GameEngine<string>(gameRepository);
+//define gameController
+var gameController = new GameController<string>(game);
 //method for setting playerCount 
 string setPlayerCount()
 {
@@ -32,9 +39,9 @@ string setPlayerCount()
     {
         game.State.Players.Add(new Player()
         {
-            NickName   = "Human " + (i+1),
+            NickName   = "Player " + (i+1),
             PlayerType = EPlayerType.Human,
-            Position = i+1
+            Position = i
         });
     }
     game.UpdateGame();
@@ -73,6 +80,26 @@ string? editPlayerNamesAndTypes()
     return null;
 }
 
+/*string? openPlayerMenu(string shortCut)
+{
+    var position = int.Parse(shortCut) - 1;
+    var playerMenu = new Menu(EMenuLevel.Other, game.State.Players[position].NickName, new List<MenuItem>()
+        {
+            new MenuItem(
+                "Edit name: " + game.State.Players[position].NickName,
+                null,
+                "n",
+                null),
+            new MenuItem(
+                "Edit type: " + game.State.Players[position].PlayerType,
+                null,
+                "t",
+                null)
+        }
+    );
+    return null;
+}*/
+
 //method to show players names and types
 string? showPlayersNamesAndTypes()
 {
@@ -82,29 +109,15 @@ string? showPlayersNamesAndTypes()
         playersAsMenuItems.Add(
             new MenuItem(
                 game.State.Players[i].NickName + " " + game.State.Players[i].PlayerType,
+                null,
                 (i+1).ToString(),
                 null
-                //TODO kuidas kasutada ühe sisendparameetriga meetodit !! 
-                //tahaks, et methodToRun oleks showPlayer(var i), nii et saaks järgmise menuLvli avada Menu klassina,
-                //kus pealkirjaks on avatud mängija nimi ja oleks üks menuItem, millega saaks muuta nime ja tüüpi + "b","r","x"
-                //
-                // showPlayer(var i)
-                // {
-                //      var playerMenu = new Menu(level:EMenuLevel.Other, title:game.Players[i].NickName, new List<MenuItem>()
-                //          {
-                //          new MenuItem(
-                //              title: "edit name and type",
-                //              shortcut: "e",
-                //              method: editNameAndType),
-                //          }
-                //      );
-                // return something
-                // }
             ));
     }
     playersAsMenuItems.Add(
         new MenuItem(
             "EDIT players",
+            null,
             "e",
             editPlayerNamesAndTypes
             ));
@@ -113,7 +126,7 @@ string? showPlayersNamesAndTypes()
     return playersMenu.Run();
 }
 
-string? setDeckSize()//TODO
+string? setDeckSize()
 {
     Console.WriteLine("Max 3 packs of cards can be used.");
     bool correctCount = false;
@@ -135,20 +148,46 @@ string? setDeckSize()//TODO
     return null;
 }
 
+string? setDeckType()
+{
+    game.State.CardDeck.DeckType = 
+        (game.State.CardDeck.DeckType == ECardDeckType.Modern) ?
+            ECardDeckType.Original : ECardDeckType.Modern;
+    //game.State.CardDeck.DeckType += 1;
+    game.UpdateGame();
+    return null;
+}
+
 string? runOptionsMenu()
 {
     //constructing new optionsMenu with items
     var optionsGameMenu = new Menu(EMenuLevel.Second, "Options", new List<MenuItem>()
         {
             new MenuItem(
-                "Cards used: "+game.State.CardDeck.Size, 
+                "No of card-packs used: "+ game.State.CardDeck.Size, 
+                (() => "No of card-packs used: "+game.State.CardDeck.Size.ToString()),//anonym. func
                 "p", 
                 setDeckSize
                 ),
+            //TODO modernDeckType 
+            // new MenuItem(
+            //     "Type of deck used: "+ game.State.CardDeck.DeckType, 
+            //     (() => "Type of deck used: "+game.State.CardDeck.DeckType.ToString()),
+            //     "t", 
+            //     setDeckType
+            // ),
+            new MenuItem(
+                "Type of deck used: "+ game.State.CardDeck.DeckType, 
+                null,
+                "t", 
+                null
+            ),
+            
         }
     );
+    
     //returns and activates new menu
-    return optionsGameMenu.Run();
+    return optionsGameMenu.Run();;
 }
 //method for picking New Game
 string? runNewGameMenu()
@@ -158,16 +197,19 @@ string? runNewGameMenu()
         {
             new MenuItem(
                 "Player count: "+game.State.Players.Count, 
+                (() => "Player count: "+game.State.Players.Count.ToString()),
                 "c", 
                 setPlayerCount),
             new MenuItem(
-                "Show players", 
+                "Show players: " + string.Join(", ", game.State.Players), 
+                (() => "Show players: "+ string.Join(", ", game.State.Players)),
                 "t", 
-                showPlayersNamesAndTypes),
+                editPlayerNamesAndTypes),
             new MenuItem(
                 "Start the game of UNO", 
+                null,
                 "s", 
-                null),
+                gameController.MainLoop),
         }
     );
     //returns and activates new menu
@@ -178,14 +220,17 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
 {
     new MenuItem(
         "Start a new game", 
+        null,
         "s", 
         runNewGameMenu),
     new MenuItem(
         "Load game", 
+        null,
         "l", 
         loadGame),
     new MenuItem(
         "Options", 
+        null,
         "o", 
         runOptionsMenu),
 });
@@ -197,5 +242,12 @@ string loadGame()
 }
 //run the consoleApp 
 mainMenu.Run();
-game.SaveGame();
+game.ShowPlayerHand();
+//game.State.Players[0].PlayerHand.AddRange(game.State.CardDeck.Draw(3));
+//game.ShowPlayerHand();
+Console.WriteLine(game.State.CardDeck.DeckType);
+Console.WriteLine(game.State.CardDeck.Cards.Count + 14 + 1);
+
+
+//game.SaveGame();
 
