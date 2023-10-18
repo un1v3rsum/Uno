@@ -16,7 +16,7 @@ public enum ECardValues
     Reverse, 
     DrawTwo, 
     Wild, 
-    WildDrawFour,
-    WildShuffleHands,//*new type from year 2018
-    WildCustomizable//*new type from year 2018
+    DrawFour,
+    ShuffleHands,//*new type from year 2018
+    Customizable//*new type from year 2018
 }

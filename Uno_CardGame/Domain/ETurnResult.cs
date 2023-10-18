@@ -3,12 +3,13 @@ namespace Domain;
 public enum ETurnResult
 {
     GameStart, 
+    OnGoing,
     PlayedCard, 
     Skip, 
     DrawTwo, 
     Attacked, 
-    ForceDraw, 
-    ForceDrawPlay, 
+    DrawCard, 
+    DrawCardAndPlayIt, 
     WildCard, 
     WildDrawFour, 
     Reversed, 

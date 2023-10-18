@@ -40,14 +40,13 @@ string setPlayerCount()
         game.State.Players.Add(new Player()
         {
             NickName   = "Player " + (i+1),
-            PlayerType = EPlayerType.Human,
-            Position = i
+            PlayerType = EPlayerType.Human
         });
     }
     game.UpdateGame();
     return null;
 }
-
+//method for changing players names and types
 string? editPlayerNamesAndTypes()
 {
     for (int i = 0; i < game.State.Players.Count; i++)
@@ -100,8 +99,8 @@ string? editPlayerNamesAndTypes()
     return null;
 }*/
 
-//method to show players names and types
-string? showPlayersNamesAndTypes()
+//method to show players names and types (old version)
+/*string? showPlayersNamesAndTypes()
 {
     var playersAsMenuItems = new List<MenuItem>();
     for (int i = 0; i < game.State.Players.Count; i++)
@@ -124,8 +123,8 @@ string? showPlayersNamesAndTypes()
     
     var playersMenu = new Menu(EMenuLevel.Other, "Players List", playersAsMenuItems);
     return playersMenu.Run();
-}
-
+}*/
+//method for changing the deck size
 string? setDeckSize()
 {
     Console.WriteLine("Max 3 packs of cards can be used.");
@@ -147,13 +146,12 @@ string? setDeckSize()
     game.UpdateGame();
     return null;
 }
-
+//TODO if game with original deck is finished
 string? setDeckType()
 {
-    game.State.CardDeck.DeckType = 
-        (game.State.CardDeck.DeckType == ECardDeckType.Modern) ?
-            ECardDeckType.Original : ECardDeckType.Modern;
-    //game.State.CardDeck.DeckType += 1;
+    game.State.CardDeck.DeckType = (game.State.CardDeck.DeckType == ECardDeckType.Modern) 
+            ? ECardDeckType.Original 
+            : ECardDeckType.Modern;
     game.UpdateGame();
     return null;
 }
@@ -201,8 +199,8 @@ string? runNewGameMenu()
                 "c", 
                 setPlayerCount),
             new MenuItem(
-                "Show players: " + string.Join(", ", game.State.Players), 
-                (() => "Show players: "+ string.Join(", ", game.State.Players)),
+                "Edit players: " + string.Join(", ", game.State.Players), 
+                (() => "Edit players: "+ string.Join(", ", game.State.Players)),
                 "t", 
                 editPlayerNamesAndTypes),
             new MenuItem(
@@ -242,11 +240,11 @@ string loadGame()
 }
 //run the consoleApp 
 mainMenu.Run();
-game.ShowPlayerHand();
+//game.ShowPlayerHand();
 //game.State.Players[0].PlayerHand.AddRange(game.State.CardDeck.Draw(3));
 //game.ShowPlayerHand();
-Console.WriteLine(game.State.CardDeck.DeckType);
-Console.WriteLine(game.State.CardDeck.Cards.Count + 14 + 1);
+//Console.WriteLine(game.State.CardDeck.DeckType);
+//Console.WriteLine(game.State.CardDeck.Cards.Count + 14 + 1);
 
 
 //game.SaveGame();

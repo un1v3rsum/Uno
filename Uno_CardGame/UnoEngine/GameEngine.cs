@@ -41,22 +41,20 @@ public class GameEngine<TKey>
             {
                 NickName = "Puny human",
                 PlayerType = EPlayerType.Human,
-                Position = 0
             },
             new Player()
             {
                 NickName = "Mighty AI",
                 PlayerType = EPlayerType.AI,
-                Position = 1
             },
         };
     }
     //method for dealing cards to the player
     private void InitializePlayerHand()
     {//create a new list of gamecards for every player
-        foreach (var player in State.Players)
+        foreach (var t in State.Players)
         {
-            State.Players[player.Position].PlayerHand = new List<GameCard>();
+            t.PlayerHand = new List<GameCard>();
         }
         //in a double loop deal an even number of cards to every player
         //total of cards dealt = initialHandSize * player count
@@ -80,11 +78,10 @@ public class GameEngine<TKey>
         //remove it from carddeck
         State.CardDeck.Cards.RemoveAt(0);
 
-        //Game rules do not allow the first discard to be a wild.
-        while(State.DiscardedCards.First().CardValue == ECardValues.Wild || 
-              State.DiscardedCards.First().CardValue == ECardValues.WildDrawFour ||
-              State.DiscardedCards.First().CardValue == ECardValues.WildCustomizable ||
-              State.DiscardedCards.First().CardValue == ECardValues.WildShuffleHands)
+        //Game rules do not allow the first discard to be a wildDrawFour or newer wild cards.
+        while(State.DiscardedCards.First().CardValue == ECardValues.DrawFour ||
+              State.DiscardedCards.First().CardValue == ECardValues.Customizable ||
+              State.DiscardedCards.First().CardValue == ECardValues.ShuffleHands)
         {
             State.DiscardedCards.Insert(0, State.CardDeck.Cards.First());
             State.CardDeck.Cards.RemoveAt(0);
@@ -105,22 +102,75 @@ public class GameEngine<TKey>
 //method to show playerHand on console
     public void ShowPlayerHand()
     {
-        Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + "'s turn. Cards on hand: ");
+        //Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + "'s turn. Cards on hand: ");
         for (int i = 0; i < State.Players[State.ActivePlayerNo].PlayerHand.Count; i++)
         {
-            Console.Write(" |" + State.Players[State.ActivePlayerNo].PlayerHand[i].ToString() + "| ");
+            Console.WriteLine(i + ") |" + State.Players[State.ActivePlayerNo].PlayerHand[i].ToString() + "| ");
+                              //+ State.Players[State.ActivePlayerNo].PlayerHand[i].CardColor + " "
+                              //+ State.Players[State.ActivePlayerNo].PlayerHand[i].CardValue);
         }
-        Console.WriteLine();
+        Console.WriteLine("d) draw a card");
+    }
+
+    public void showDiscardPile()
+    {
+        Console.WriteLine("Card on top of discard pile: |" + State.DiscardedCards.Last() + "|");
+    }
+
+    public void playCard(string position)
+    {
+        var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(position)];
+        State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(int.Parse(position));
+        State.DiscardedCards.Add(playedCard);
+        //SaveGame();
+    }
+
+    public bool checkValidity(GameCard discarded, GameCard choice)
+    {
+        if (discarded.CardValue == choice.CardValue || discarded.CardColor == choice.CardColor)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public bool IsGameOver()
     {
         return false;
     }
-
-    public bool IsItNewMove()
+    
+    //method for setting the next player
+    public void nextPlayer()
+    {   //if game goes clockwise and the activeplayerNo is less than the total of players
+        if (State.GameDirection == EGameDirection.ClockWise 
+            && State.ActivePlayerNo < State.Players.Count - 1)
+        {//increase the number
+            State.ActivePlayerNo++;
+        }
+        //if game goes clockwise and the activeplayerNo is equal to the total of players (last player in list)
+        else if (State.GameDirection == EGameDirection.ClockWise 
+            && State.ActivePlayerNo == State.Players.Count - 1)
+        {//set the number back to zero (go back to the first player)
+            State.ActivePlayerNo = 0;
+        }
+        //if game goes counterclockwise and the activeplayerNo is bigger than zero (not the first player)
+        if (State is { GameDirection: EGameDirection.CounterClockWise, ActivePlayerNo: > 0 })
+        {//decrease the number
+            State.ActivePlayerNo--;
+        }
+        //if game goes counterclockwise and the activeplayerNo is equal to zero (first player)
+        else if(State is { GameDirection: EGameDirection.CounterClockWise, ActivePlayerNo: 0 })
+        {//go back to the end of the players list
+            State.ActivePlayerNo = State.Players.Count - 1;
+        }
+    }
+    //method for changing the game direction
+    public void setGameDirection()
     {
-        return true;
+        State.GameDirection = (State.GameDirection == EGameDirection.ClockWise)
+            ? EGameDirection.CounterClockWise
+            : EGameDirection.ClockWise;
     }
     
 }

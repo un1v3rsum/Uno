@@ -41,9 +41,9 @@ public class GameCard
             ECardValues.Reverse => "REVERSE",
             ECardValues.DrawTwo => "+2",
             ECardValues.Wild => "",
-            ECardValues.WildDrawFour => "+4",
-            ECardValues.WildShuffleHands => "SHUFFLE",
-            ECardValues.WildCustomizable => "CUSTOMIZABLE"
+            ECardValues.DrawFour => "+4",
+            ECardValues.ShuffleHands => "SHUFFLE",
+            ECardValues.Customizable => "CUSTOMIZABLE"
         };
     
 }

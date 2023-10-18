@@ -95,7 +95,7 @@ public class CardDeck
                     Cards.Add(new GameCard()
                     {
                         CardColor = color,
-                        CardValue = ECardValues.WildDrawFour,
+                        CardValue = ECardValues.DrawFour,
                         Score = 50
                     });
                 }
@@ -107,7 +107,7 @@ public class CardDeck
                         Cards.Add(new GameCard()
                         {
                             CardColor = color,
-                            CardValue = ECardValues.WildCustomizable,
+                            CardValue = ECardValues.Customizable,
                             Score = 40
                         });
                     }
@@ -115,7 +115,7 @@ public class CardDeck
                     Cards.Add(new GameCard()
                     {
                         CardColor = color,
-                        CardValue = ECardValues.WildShuffleHands,
+                        CardValue = ECardValues.ShuffleHands,
                         Score = 40
                     });
                 }
