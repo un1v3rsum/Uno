@@ -12,6 +12,10 @@ public class GameCard
     {
         return CardColorToString() + CardValueToString();
     }
+    public string ToString2()
+    {
+        return CardColor.ToString() + CardValueToString();
+    }
     //method for giving string emoji values for CardColors
     private string CardColorToString() =>
         CardColor switch

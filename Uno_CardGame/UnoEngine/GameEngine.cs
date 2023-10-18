@@ -99,25 +99,65 @@ public class GameEngine<TKey>
     {
         return GameRepository.LoadGame(1);
     }
+
+    public void PlayerMove()
+    {
+        var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
+        bool correctInput = false;
+        do
+        {
+            ShowDiscardPile();
+            Console.WriteLine($"Players ({State.Players[State.ActivePlayerNo].NickName }) " + $" cards on hand: ");
+            ShowPlayerHand();
+            Console.Write("Choose your card: ");
+            var choice = Console.ReadLine();
+            if (choice == "d")
+            {
+                Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew a new card!");
+                State.Players[State.ActivePlayerNo].PlayerHand.
+                    AddRange(State.CardDeck.Draw(1));
+                correctInput = true;
+            }
+
+            else if (int.Parse(choice) > 0 && int.Parse(choice) <= handSize)
+            {
+                if (CheckValidity(State.DiscardedCards.First(), State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(choice)]))
+                {
+                    PlayCard(choice);
+                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played " 
+                        + State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(choice)].ToString2());
+                    correctInput = true;
+                }
+                else
+                {
+                    Console.WriteLine("This card cant be played!");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Undefined shortcut....");
+            }
+        } while (correctInput == false);
+    }
 //method to show playerHand on console
     public void ShowPlayerHand()
     {
         //Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + "'s turn. Cards on hand: ");
         for (int i = 0; i < State.Players[State.ActivePlayerNo].PlayerHand.Count; i++)
         {
-            Console.WriteLine(i + ") |" + State.Players[State.ActivePlayerNo].PlayerHand[i].ToString() + "| ");
+            Console.WriteLine((i+1) + ") |" + State.Players[State.ActivePlayerNo].PlayerHand[i].ToString() + "| ");
                               //+ State.Players[State.ActivePlayerNo].PlayerHand[i].CardColor + " "
                               //+ State.Players[State.ActivePlayerNo].PlayerHand[i].CardValue);
         }
         Console.WriteLine("d) draw a card");
     }
 
-    public void showDiscardPile()
+    public void ShowDiscardPile()
     {
         Console.WriteLine("Card on top of discard pile: |" + State.DiscardedCards.Last() + "|");
     }
 
-    public void playCard(string position)
+    public void PlayCard(string position)
     {
         var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(position)];
         State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(int.Parse(position));
@@ -125,7 +165,7 @@ public class GameEngine<TKey>
         //SaveGame();
     }
 
-    public bool checkValidity(GameCard discarded, GameCard choice)
+    public bool CheckValidity(GameCard discarded, GameCard choice)
     {
         if (discarded.CardValue == choice.CardValue || discarded.CardColor == choice.CardColor)
         {
@@ -141,7 +181,7 @@ public class GameEngine<TKey>
     }
     
     //method for setting the next player
-    public void nextPlayer()
+    public void NextPlayer()
     {   //if game goes clockwise and the activeplayerNo is less than the total of players
         if (State.GameDirection == EGameDirection.ClockWise 
             && State.ActivePlayerNo < State.Players.Count - 1)
@@ -166,7 +206,7 @@ public class GameEngine<TKey>
         }
     }
     //method for changing the game direction
-    public void setGameDirection()
+    public void SetGameDirection()
     {
         State.GameDirection = (State.GameDirection == EGameDirection.ClockWise)
             ? EGameDirection.CounterClockWise
