@@ -40,7 +40,8 @@ string setPlayerCount()
         game.State.Players.Add(new Player()
         {
             NickName   = "Player " + (i+1),
-            PlayerType = EPlayerType.Human
+            PlayerType = EPlayerType.Human,
+            Score = 0,
         });
     }
     game.UpdateGame();

@@ -41,11 +41,13 @@ public class GameEngine<TKey>
             {
                 NickName = "Puny human",
                 PlayerType = EPlayerType.Human,
+                Score = 0,
             },
             new Player()
             {
                 NickName = "Mighty AI",
                 PlayerType = EPlayerType.AI,
+                Score = 0,
             },
         };
     }
@@ -71,7 +73,8 @@ public class GameEngine<TKey>
     }
 //method for creating a discard pile
     private void InitializeDiscardPile()
-    {   //new list of discardedCards 
+    {
+        //new list of discardedCards 
         State.DiscardedCards = new List<GameCard>();
         //Add a single card to the discard pile
         State.DiscardedCards.Add(State.CardDeck.Cards.First());
@@ -86,6 +89,8 @@ public class GameEngine<TKey>
             State.DiscardedCards.Insert(0, State.CardDeck.Cards.First());
             State.CardDeck.Cards.RemoveAt(0);
         }
+
+        State.DeclaredColor = State.DiscardedCards.Last().CardColor;
     }
     //method to save a game
     //@this moment id = fileName
@@ -105,38 +110,57 @@ public class GameEngine<TKey>
         var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
         bool correctInput = false;
         do
-        {
+        {   
             ShowDiscardPile();
             Console.WriteLine($"Players ({State.Players[State.ActivePlayerNo].NickName }) " + $" cards on hand: ");
             ShowPlayerHand();
             Console.Write("Choose your card: ");
-            var choice = Console.ReadLine();
+            var choice = Console.ReadLine().ToLower().Trim();
             if (choice == "d")
             {
                 Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew a new card!");
                 State.Players[State.ActivePlayerNo].PlayerHand.
                     AddRange(State.CardDeck.Draw(1));
+                //TODO check if new card can be played
+                if (CheckValidity(State.DiscardedCards.Last(), State.Players[State.ActivePlayerNo].PlayerHand.Last()))
+                {
+                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " plays the new card:  " 
+                        + State.Players[State.ActivePlayerNo].PlayerHand.Last().ToString2());
+                    PlayCard(State.Players[State.ActivePlayerNo].PlayerHand.Count - 1);
+                    if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+                    {
+                        DeclareColor();
+                    }
+                }
+                NextPlayer();
                 correctInput = true;
             }
-
-            else if (int.Parse(choice) > 0 && int.Parse(choice) <= handSize)
+            else if (int.TryParse(choice,out var position) && position > 0 && position <= handSize)
             {
-                if (CheckValidity(State.DiscardedCards.First(), State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(choice)]))
+                if (!CheckValidity(State.DiscardedCards.Last(), State.Players[State.ActivePlayerNo].PlayerHand[position - 1]))
                 {
-                    PlayCard(choice);
-                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played " 
-                        + State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(choice)].ToString2());
-                    correctInput = true;
+                    Console.WriteLine("This card cant be played!");
                 }
                 else
                 {
-                    Console.WriteLine("This card cant be played!");
+                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played " 
+                        + State.Players[State.ActivePlayerNo].PlayerHand[position - 1].ToString2());
+                    PlayCard(position-1);
+                    //check if played card is wild
+                    if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+                    {
+                        DeclareColor();
+                    }
+                    NextPlayer();
+                    correctInput = true;
                 }
             }
             else
             {
                 Console.WriteLine("Undefined shortcut....");
             }
+            
+            
         } while (correctInput == false);
     }
 //method to show playerHand on console
@@ -146,8 +170,6 @@ public class GameEngine<TKey>
         for (int i = 0; i < State.Players[State.ActivePlayerNo].PlayerHand.Count; i++)
         {
             Console.WriteLine((i+1) + ") |" + State.Players[State.ActivePlayerNo].PlayerHand[i].ToString() + "| ");
-                              //+ State.Players[State.ActivePlayerNo].PlayerHand[i].CardColor + " "
-                              //+ State.Players[State.ActivePlayerNo].PlayerHand[i].CardValue);
         }
         Console.WriteLine("d) draw a card");
     }
@@ -156,27 +178,86 @@ public class GameEngine<TKey>
     {
         Console.WriteLine("Card on top of discard pile: |" + State.DiscardedCards.Last() + "|");
     }
-
-    public void PlayCard(string position)
+    //TODO color declaration 
+    public void DeclareColor()
     {
-        var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[int.Parse(position)];
-        State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(int.Parse(position));
+        bool correctInput = false;
+        do
+        {
+            Console.WriteLine("WILD card was played!");
+            Console.WriteLine("1) " + ECardColor.Blue.ToString());
+            Console.WriteLine("2) " + ECardColor.Red.ToString());
+            Console.WriteLine("3) " + ECardColor.Green.ToString());
+            Console.WriteLine("4) " + ECardColor.Yellow.ToString());
+            Console.Write($"Player ({State.Players[State.ActivePlayerNo].NickName }) " +$" declare a color: ");
+            var choice = Console.ReadLine().ToLower().Trim();
+            switch (choice)
+            {
+                case "1":
+                    State.DiscardedCards.Last().CardColor = ECardColor.Blue;
+                    correctInput = true;
+                    break;
+                case "2":
+                    State.DiscardedCards.Last().CardColor = ECardColor.Red;
+                    correctInput = true;
+                    break;
+                case "3":
+                    State.DiscardedCards.Last().CardColor = ECardColor.Green;
+                    correctInput = true;
+                    break;
+                case "4":
+                    State.DiscardedCards.Last().CardColor = ECardColor.Yellow;
+                    correctInput = true;
+                    break;
+            }
+
+            Console.WriteLine("Undefined shortcut...");
+        } while (correctInput == false);
+        ShowDiscardPile();
+    }
+
+    public void PlayCard(int position)
+    {
+        var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[position];
+        State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(position);
         State.DiscardedCards.Add(playedCard);
         //SaveGame();
     }
 
     public bool CheckValidity(GameCard discarded, GameCard choice)
     {
-        if (discarded.CardValue == choice.CardValue || discarded.CardColor == choice.CardColor)
+        if (discarded.CardValue == choice.CardValue || discarded.CardColor == choice.CardColor || choice.CardValue == ECardValues.Wild)
         {
             return true;
         }
+        //TODO if player plays wild+4
 
         return false;
     }
-
+    //TODO
     public bool IsGameOver()
     {
+        
+        if (State.Players[State.ActivePlayerNo].Score >= 500)
+        {
+            Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " wins the game! Score: " + State.Players[State.ActivePlayerNo].Score);
+            return true;
+        }
+        return false;
+    }
+    //TODO 
+    public bool IsHandFinished()
+    {
+        if (State.Players[State.ActivePlayerNo].PlayerHand.Count == 0)
+        {
+            Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " has 0 cards left! ");
+            return true;
+        }
+        if (State.CardDeck.Size == 0)
+        {
+            Console.WriteLine("Card deck is empty!  ");
+            return true;
+        }
         return false;
     }
     

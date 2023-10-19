@@ -41,6 +41,7 @@ public class GameController<TKey>
             if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
             {
                 Console.WriteLine("Last card played was DRAW-TWO.");
+                
                 Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
                                   + $" takes 2 cards and misses his turn! ");
                 
@@ -65,7 +66,7 @@ public class GameController<TKey>
             if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour 
                 && _gameEngine.State.TurnResult != ETurnResult.GameStart)
             {
-                Console.WriteLine("Last card played was a WILD.");
+                Console.WriteLine("Last card played was a WILD DRAW FOUR.");
                 Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
                                   + $"declares the first color! ");
                 Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
