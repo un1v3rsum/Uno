@@ -14,73 +14,105 @@ public class GameController<TKey>
     public string? MainLoop()
     {
         Console.Clear();
-        Console.WriteLine("< NEW GAME >");
-        
+        Console.WriteLine("<============ NEW GAME ============>");
+        //first level loop for the game
         while (_gameEngine.IsGameOver() == false)
         {
+            Console.WriteLine("<======== STARTING NEW HAND =======>");   
+            Console.WriteLine("First card in discard-pile: " + _gameEngine.State.DiscardedCards.First().ToString());
             var choice = "";
+            //second level loop for the hand
+            while (_gameEngine.IsHandFinished() == false)
+            {
+                if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)
+                {
+                    //TODO YELLOW_SKIP not working
+                    Console.WriteLine("Last card played was SKIP.");
+                    Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
+                                      + $"misses his turn! ");
+                    _gameEngine.NextPlayer();
+                    _gameEngine.PlayerMove();
+                
+                }
             
-            if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)
-            {
-                Console.WriteLine("Last card played was SKIP.");
-                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                  + $"misses his turn! ");
-                _gameEngine.NextPlayer();
-                _gameEngine.PlayerMove();
+                if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Reverse)
+                {
+                    Console.WriteLine("Last card played was REVERSE. Direction will be set to counterclockwise!");
+                    _gameEngine.SetGameDirection();
+                    _gameEngine.NextPlayer();
+                    _gameEngine.PlayerMove();
+                }
+            
+                if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
+                {
+                    Console.WriteLine("Last card played was DRAW-TWO.");
                 
+                    Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
+                                      + $" takes 2 cards and misses his turn! ");
+                
+                    _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
+                        PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(2));
+                
+                    _gameEngine.NextPlayer();
+                    _gameEngine.PlayerMove();
+                }
+            
+                if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Wild)
+                {
+                    Console.WriteLine("Last card played was a WILD.");
+                    Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
+                                      + $"cards on hand: ");
+                    //if it is the start of the game, then first player picks the color
+                    if (_gameEngine.State.TurnResult == ETurnResult.GameStart)
+                    {
+                        _gameEngine.State.TurnResult = ETurnResult.OnGoing;
+                        _gameEngine.DeclareColor();
+                    }
+                    
+                    _gameEngine.PlayerMove();
+                    //Player to dealer's left declares the first color to be matched and takes the first turn
+                }
+                if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour)
+                {
+                    Console.WriteLine("Last card played was a WILD DRAW FOUR.");
+                    if (_gameEngine.State.TurnResult == ETurnResult.GameStart)
+                    {
+                        _gameEngine.State.TurnResult = ETurnResult.OnGoing;
+                        Console.WriteLine("FIRST DRAW IN THE GAME, CARD IS PUT BACK TO THE DECK!");
+                        _gameEngine.State.CardDeck.Cards.Add(_gameEngine.State.DiscardedCards.First());
+                        _gameEngine.State.DiscardedCards.RemoveAt(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
+                                          + $" takes 4 cards and misses his turn! ");
+                
+                        _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
+                            PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(4));
+                        _gameEngine.NextPlayer();
+                    }
+                    
+                    _gameEngine.PlayerMove();
+                    //Player to dealer's left declares the first color to be matched and takes the first turn
+                }
+                //if we have a number card
+                if (_gameEngine.State.DiscardedCards.Last().CardValue is not ECardValues.Wild 
+                    or ECardValues.Reverse or ECardValues.Skip or ECardValues.DrawTwo or ECardValues.DrawFour)
+                {
+                    _gameEngine.PlayerMove();
+                }
+            }
+            //calculate player score
+            _gameEngine.CalculateScore();
+            //check if gameOver
+            if (!_gameEngine.IsGameOver())
+            {
+                ////initialize new deck if game not over
+                _gameEngine.UpdateGame();
             }
             
-            if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Reverse)
-            {
-                Console.WriteLine("Last card played was REVERSE. Direction will be set to counterclockwise!");
-                _gameEngine.SetGameDirection();
-                _gameEngine.NextPlayer();
-                _gameEngine.PlayerMove();
-            }
             
-            if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
-            {
-                Console.WriteLine("Last card played was DRAW-TWO.");
-                
-                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                  + $" takes 2 cards and misses his turn! ");
-                
-                _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
-                    PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(2));
-                
-                _gameEngine.NextPlayer();
-                _gameEngine.PlayerMove();
-            }
             
-            if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Wild)
-            {
-                Console.WriteLine("Last card played was a WILD.");
-                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                  + $"declares the first color! ");
-                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                  + $"cards on hand: ");
-                
-                _gameEngine.PlayerMove();
-                //Player to dealer's left declares the first color to be matched and takes the first turn
-            }
-            if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour 
-                && _gameEngine.State.TurnResult != ETurnResult.GameStart)
-            {
-                Console.WriteLine("Last card played was a WILD DRAW FOUR.");
-                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                  + $"declares the first color! ");
-                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                  + $"cards on hand: ");
-                
-                _gameEngine.PlayerMove();
-                //Player to dealer's left declares the first color to be matched and takes the first turn
-            }
-            //if we have a number card
-            if (_gameEngine.State.DiscardedCards.Last().CardValue is not ECardValues.Wild 
-                or ECardValues.Reverse or ECardValues.Skip or ECardValues.DrawTwo or ECardValues.DrawFour)
-            {
-                _gameEngine.PlayerMove();
-            }
             
             /*Console.WriteLine("active player no: " + _gameEngine.State.ActivePlayerNo);
             Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
