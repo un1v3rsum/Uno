@@ -193,7 +193,7 @@ string loadGame()
 {
     game.State = game.LoadGame();
     game.State.TurnResult = ETurnResult.LoadGame;
-    game.QuitGame = false;
+    game.GameDone = false;
     gameController.MainLoop();
     return null;
 }

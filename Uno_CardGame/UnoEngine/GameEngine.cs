@@ -7,8 +7,9 @@ public class GameEngine<TKey>
 {//gameEngine attributes: gameRepo, State and initialHandSize of the player
     public IGameRepository<TKey> GameRepository { get; set; }
     public GameState State { get; set; } = new GameState();
-    private const int InitialHandSize = 7;
-    public bool QuitGame { get; set; }
+    private const int InitialHandSize = 2;
+    public bool GameDone { get; set; }
+    public bool HandDone { get; set; }
 
     //gameEngine constructor
     public GameEngine(IGameRepository<TKey> repository)
@@ -74,7 +75,7 @@ public class GameEngine<TKey>
         }
     }
 //method for creating a discard pile
-    private void InitializeDiscardPile()
+    public void InitializeDiscardPile()
     {
         //new list of discardedCards 
         State.DiscardedCards = new List<GameCard>();
@@ -117,7 +118,7 @@ public class GameEngine<TKey>
             {
                 Console.WriteLine("Game shuts down!");
                 SaveGame();
-                QuitGame = true;
+                GameDone = true;
                 correctInput = true;
             }
             if (choice == "d")
@@ -272,7 +273,7 @@ public class GameEngine<TKey>
         }
         return true;
     }
-
+    //calculates the score for every card that other player are left in their hand
     public void CalculateScore()
     {
         foreach (var player in State.Players)
@@ -285,7 +286,7 @@ public class GameEngine<TKey>
         Console.WriteLine(State.Players[State.ActivePlayerNo].NickName +
                           " wins the hand! Score: " + State.Players[State.ActivePlayerNo].Score);
     }
-    
+    //game is over if a player has a score of 500 points
     public bool IsGameOver()
     {
         if (State.Players[State.ActivePlayerNo].Score >= 500)
@@ -296,27 +297,23 @@ public class GameEngine<TKey>
         }
         return false;
     }
-    //additional boolean method to check if user quit the game themselves
-    //if this is true then no score is calculated, when game terminates
-    public bool IsSaveAndQuit()
-    {
-        if (QuitGame)
-        {
-            return true;
-        }
-        return false;
-    }
+    //hand is finished when a player has 0 cards in their hand or cardDeck is empty
     public bool IsHandFinished()
     {
-
         if (State.Players[State.ActivePlayerNo].PlayerHand.Count == 0)
         {
             Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " has 0 cards left! ");
+            CalculateScore();
+            State.TurnResult = ETurnResult.GameStart;
+            UpdateGame();
             return true;
         }
         if (State.CardDeck.Size == 0)
         {
             Console.WriteLine("Card deck is empty!  ");
+            CalculateScore();
+            State.TurnResult = ETurnResult.GameStart;
+            UpdateGame();
             return true;
         }
         return false;
