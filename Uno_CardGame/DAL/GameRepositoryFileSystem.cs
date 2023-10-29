@@ -2,7 +2,7 @@ using System.Text.Json;
 using Domain;
 
 namespace DAL;
-
+//TODO database saving
 public class GameRepositoryFileSystem : IGameRepository<string>
 {
     private readonly string _filePrefix = "." + System.IO.Path.DirectorySeparatorChar;

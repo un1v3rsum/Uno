@@ -17,6 +17,7 @@ public enum ECardValues
     DrawTwo, 
     Wild, 
     DrawFour,
+    //TODO 
     ShuffleHands,//*new type from year 2018
     Customizable//*new type from year 2018
 }

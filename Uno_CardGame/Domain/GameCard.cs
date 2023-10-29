@@ -7,7 +7,7 @@ public class GameCard
     public ECardColor CardColor { get; set; }
     public ECardValues CardValue { get; set; }
     public int Score { get; set; }
-    //method for combining CardColor and CardValue
+    //methods for combining CardColor and CardValue as colored cards in console or plain text 
     public override string ToString()
     {
         return CardColorToString() + CardValueToString();

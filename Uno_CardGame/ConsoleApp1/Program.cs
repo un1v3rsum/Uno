@@ -80,51 +80,6 @@ string? editPlayerNamesAndTypes()
     return null;
 }
 
-/*string? openPlayerMenu(string shortCut)
-{
-    var position = int.Parse(shortCut) - 1;
-    var playerMenu = new Menu(EMenuLevel.Other, game.State.Players[position].NickName, new List<MenuItem>()
-        {
-            new MenuItem(
-                "Edit name: " + game.State.Players[position].NickName,
-                null,
-                "n",
-                null),
-            new MenuItem(
-                "Edit type: " + game.State.Players[position].PlayerType,
-                null,
-                "t",
-                null)
-        }
-    );
-    return null;
-}*/
-
-//method to show players names and types (old version)
-/*string? showPlayersNamesAndTypes()
-{
-    var playersAsMenuItems = new List<MenuItem>();
-    for (int i = 0; i < game.State.Players.Count; i++)
-    {
-        playersAsMenuItems.Add(
-            new MenuItem(
-                game.State.Players[i].NickName + " " + game.State.Players[i].PlayerType,
-                null,
-                (i+1).ToString(),
-                null
-            ));
-    }
-    playersAsMenuItems.Add(
-        new MenuItem(
-            "EDIT players",
-            null,
-            "e",
-            editPlayerNamesAndTypes
-            ));
-    
-    var playersMenu = new Menu(EMenuLevel.Other, "Players List", playersAsMenuItems);
-    return playersMenu.Run();
-}*/
 //method for changing the deck size
 string? setDeckSize()
 {
@@ -147,7 +102,7 @@ string? setDeckSize()
     game.UpdateGame();
     return null;
 }
-//TODO if game with original deck is finished
+//TODO 
 string? setDeckType()
 {
     game.State.CardDeck.DeckType = (game.State.CardDeck.DeckType == ECardDeckType.Modern) 
@@ -168,7 +123,7 @@ string? runOptionsMenu()
                 "p", 
                 setDeckSize
                 ),
-            //TODO modernDeckType 
+            //TODO modernDeckType UNO after year 2018
             // new MenuItem(
             //     "Type of deck used: "+ game.State.CardDeck.DeckType, 
             //     (() => "Type of deck used: "+game.State.CardDeck.DeckType.ToString()),
@@ -233,20 +188,16 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
         "o", 
         runOptionsMenu),
 });
-
+//TODO doesn't work if game is quit MidGame and tried to load back up again
 string loadGame()
 {
     game.State = game.LoadGame();
+    game.State.TurnResult = ETurnResult.LoadGame;
+    game.QuitGame = false;
+    gameController.MainLoop();
     return null;
 }
 //run the consoleApp 
 mainMenu.Run();
-//game.ShowPlayerHand();
-//game.State.Players[0].PlayerHand.AddRange(game.State.CardDeck.Draw(3));
-//game.ShowPlayerHand();
-//Console.WriteLine(game.State.CardDeck.DeckType);
-//Console.WriteLine(game.State.CardDeck.Cards.Count + 14 + 1);
 
-
-//game.SaveGame();
 

@@ -149,6 +149,7 @@ public class CardDeck
         var cardsDrawn = Cards.Take(count).ToList();
         //remove cards frow previous list
         Cards.RemoveAll(cards => cardsDrawn.Contains(cards));
+        
         return cardsDrawn;
     }
 

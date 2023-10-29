@@ -1,7 +1,7 @@
 using Domain;
 namespace UnoEngine;
 
-//player class with a string (nickname), enum (playertype), int (position) & list of gamecards (playerHand) attributes
+//player class with a string (nickname), enum (playertype), int (score) & list of gamecards (playerHand) attributes
 public class Player
 {
     public string NickName { get; set; } = default!;

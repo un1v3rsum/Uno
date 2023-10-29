@@ -8,7 +8,8 @@ public class GameEngine<TKey>
     public IGameRepository<TKey> GameRepository { get; set; }
     public GameState State { get; set; } = new GameState();
     private const int InitialHandSize = 7;
-    
+    public bool QuitGame { get; set; }
+
     //gameEngine constructor
     public GameEngine(IGameRepository<TKey> repository)
     {//create repository, cardDeck, default Players, playerHand and discardPile
@@ -82,15 +83,6 @@ public class GameEngine<TKey>
         //remove it from carddeck
         State.CardDeck.Cards.RemoveAt(0);
 
-        //Game rules do not allow the first discard to be a wildDrawFour or newer wild cards.
-        while(State.DiscardedCards.First().CardValue == ECardValues.DrawFour ||
-              State.DiscardedCards.First().CardValue == ECardValues.Customizable ||
-              State.DiscardedCards.First().CardValue == ECardValues.ShuffleHands)
-        {
-            State.DiscardedCards.Insert(0, State.CardDeck.Cards.First());
-            State.CardDeck.Cards.RemoveAt(0);
-        }
-
         State.DeclaredColor = State.DiscardedCards.Last().CardColor;
     }
     //method to save a game
@@ -108,15 +100,11 @@ public class GameEngine<TKey>
     //playerMove method
     public void PlayerMove()
     {
-        if (State.TurnResult == ETurnResult.GameStart)
-        {
-            State.TurnResult = ETurnResult.OnGoing;
-        }
-        //define player handSize
-        var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
-        bool correctInput = false;
+        var correctInput = false;
         do
-        {   
+        {
+            //define player handSize
+            var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
             Console.WriteLine($"<======== {State.Players[State.ActivePlayerNo].NickName }" + $"'s TURN ========>");
             //in a loop shows the activePlayer 
             ShowDiscardPile();
@@ -124,74 +112,77 @@ public class GameEngine<TKey>
             ShowPlayerHand();
             Console.WriteLine("<===================>");
             Console.Write("Choose your card: ");
-            
             var choice = Console.ReadLine().ToLower().Trim();
             if (choice == "q")
             {
-                //TODO quit game mid-session
                 Console.WriteLine("Game shuts down!");
-                correctInput = true;
                 SaveGame();
-                
-                IsGameOver();
+                QuitGame = true;
+                correctInput = true;
             }
             if (choice == "d")
             {
                 Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew a new card!");
-                State.Players[State.ActivePlayerNo].PlayerHand.
-                    AddRange(State.CardDeck.Draw(1));
+                State.Players[State.ActivePlayerNo].PlayerHand.AddRange(State.CardDeck.Draw(1));
                 
-                if (CheckValidity(State.DiscardedCards.Last(), 
+                State.TurnResult = ETurnResult.DrewCard;
+                
+                if (CheckValidity(State.DiscardedCards.Last(),
                         State.Players[State.ActivePlayerNo].PlayerHand.Last()))
                 {
-                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " plays the new card:  " 
+                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " plays the new card:  "
                         + State.Players[State.ActivePlayerNo].PlayerHand.Last().ToString2());
                     
-                    PlayCard(State.Players[State.ActivePlayerNo].PlayerHand.Count - 1);
+                    State.TurnResult = ETurnResult.OnGoing;
                     
+                    PlayCard(State.Players[State.ActivePlayerNo].PlayerHand.Count - 1);
                     if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
                     {
                         DeclareColor();
                     }
+                    
                 }
                 if (!IsHandFinished())
                 {
                     NextPlayer();
                 }
-                correctInput = true;
-            }
-            if (int.TryParse(choice,out var position) && position > 0 && position <= handSize)
-            {
-                if (!CheckValidity(State.DiscardedCards.Last(), 
-                        State.Players[State.ActivePlayerNo].PlayerHand[position - 1]))
-                {
-                    Console.WriteLine("This card cant be played!");
-                }
-                else
-                {
-                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played " 
-                        + State.Players[State.ActivePlayerNo].PlayerHand[position - 1].ToString2());
-                    
-                    PlayCard(position-1);
-                    
-                    //check if played card is wild
-                    if (State.DiscardedCards.Last().CardColor == ECardColor.Wild )
-                    {
-                        DeclareColor();
-                    }
-
-                    if (!IsHandFinished())
-                    {
-                        NextPlayer();
-                    }
-                }
+                
                 correctInput = true;
             }
             else
             {
-                Console.WriteLine("Undefined shortcut....");
+                if (int.TryParse(choice, out var position) && position > 0 && position <= handSize)
+                {
+                    if (!CheckValidity(State.DiscardedCards.Last(),
+                            State.Players[State.ActivePlayerNo].PlayerHand[position - 1]))
+                    {
+                        Console.WriteLine("This card cant be played!");
+                    }
+                    else
+                    {
+                        Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played "
+                            + State.Players[State.ActivePlayerNo].PlayerHand[position - 1].ToString2());
+
+                        PlayCard(position - 1);
+                        //check if played card is wild
+                        if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+                        {
+                            DeclareColor();
+                        }
+                        if (!IsHandFinished())
+                        {
+                            NextPlayer();
+                        }
+                    }
+                    State.TurnResult = ETurnResult.OnGoing;
+                    correctInput = true;
+                }
+                else
+                {
+                    Console.WriteLine("Undefined shortcut....");
+                }
             }
-        } while (correctInput == false);
+        } while (!correctInput);
     }
 //method to show playerHand on console
     public void ShowPlayerHand()
@@ -215,6 +206,7 @@ public class GameEngine<TKey>
         bool correctInput = false;
         do
         {
+            State.TurnResult = ETurnResult.OnGoing;
             Console.WriteLine("WILD card was played!");
             Console.WriteLine("1) " + ECardColor.Blue.ToString());
             Console.WriteLine("2) " + ECardColor.Red.ToString());
@@ -247,6 +239,7 @@ public class GameEngine<TKey>
                 Console.WriteLine("Undefined shortcut...");
             }
         } while (correctInput == false);
+        SaveGame();
         ShowDiscardPile();
     }
 
@@ -268,7 +261,6 @@ public class GameEngine<TKey>
         }
         //WILD DRAW FOUR
         //else loop through playerHand and check if they have any cards that would match the discardpile
-
         if (choice.CardValue != ECardValues.DrawFour) return false;
         foreach (var t in State.Players[State.ActivePlayerNo].PlayerHand)
         {
@@ -304,9 +296,19 @@ public class GameEngine<TKey>
         }
         return false;
     }
-    //TODO 
+    //additional boolean method to check if user quit the game themselves
+    //if this is true then no score is calculated, when game terminates
+    public bool IsSaveAndQuit()
+    {
+        if (QuitGame)
+        {
+            return true;
+        }
+        return false;
+    }
     public bool IsHandFinished()
     {
+
         if (State.Players[State.ActivePlayerNo].PlayerHand.Count == 0)
         {
             Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " has 0 cards left! ");
