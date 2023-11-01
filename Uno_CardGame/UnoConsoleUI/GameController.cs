@@ -1,14 +1,17 @@
+using DAL;
 using Domain;
 using UnoEngine;
 
 namespace UnoConsoleUI;
 
-public class GameController<TKey>
+public class GameController
 {
-    private readonly GameEngine<TKey> _gameEngine;
-    public GameController(GameEngine<TKey> gameEngine)
+    private readonly GameEngine _gameEngine;
+    private readonly IGameRepository _gameRepository;
+    public GameController(GameEngine gameEngine, IGameRepository gameRepository)
     {
         _gameEngine = gameEngine;
+        _gameRepository = gameRepository;
     }
     public string? MainLoop()
     {
@@ -24,6 +27,7 @@ public class GameController<TKey>
         {
             if (_gameEngine.State.TurnResult != ETurnResult.LoadGame)
             {
+                _gameEngine.UpdateGame();
                 //loading new hand
                 Console.WriteLine("<======== STARTING NEW HAND =======>");
                 Console.WriteLine("First card in discard-pile: " + 
@@ -35,9 +39,8 @@ public class GameController<TKey>
                 Console.WriteLine("<====== RELOADING PREVIOUS HAND =====>");
             }
             //second level loop for the hand - remains true if one of the next attributes is false
-            while (_gameEngine is { HandDone: false, GameDone: false })
+            while (!_gameEngine.HandDone)
             {
-               
                 //if the card on top of the discardpile is SKIP
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)
                 {
@@ -50,8 +53,6 @@ public class GameController<TKey>
                                           + $"misses his turn! ");
                         _gameEngine.NextPlayer();
                     }
-                    //otherwise the active player makes their move
-                    _gameEngine.PlayerMove();
                 }
                 //if the card on top of the discardpile is REVERSE
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Reverse)
@@ -62,10 +63,9 @@ public class GameController<TKey>
                         //then gameDirection is reversed
                         Console.WriteLine("Last card played was REVERSE. Direction will be set to counterclockwise!");
                         _gameEngine.SetGameDirection();
+                        //and next player is picked
                         _gameEngine.NextPlayer();
                     }
-                    //active player makes a move
-                    _gameEngine.PlayerMove();
                 }
                 //if the card on top of the discardpile is DRAWTWO
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
@@ -79,11 +79,11 @@ public class GameController<TKey>
                                           + $" takes 2 cards and misses his turn! ");
                         _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
                             PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(2));
+                        //turnResult is modified to Drew
                         _gameEngine.State.TurnResult = ETurnResult.DrewCard;
+                        //next player is picked
                         _gameEngine.NextPlayer();
                     }
-                    //active player makes a move
-                    _gameEngine.PlayerMove();
                 }
                 //if the card on top of the discardpile is REGULAR WILD CARD
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Wild)
@@ -94,8 +94,7 @@ public class GameController<TKey>
                         _gameEngine.State.TurnResult = ETurnResult.OnGoing;
                         _gameEngine.DeclareColor();
                     }
-                    //if it is an ongoing game then color declaration was done by the previous player
-                    _gameEngine.PlayerMove();
+                    //if it is an ongoing game then color declaration was already done by the previous player
                 }
                 //if the card on top of the discardpile is WILD DRAW FOUR
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour)
@@ -107,44 +106,27 @@ public class GameController<TKey>
                         Console.WriteLine("FIRST DRAW IN THE GAME, CARD IS PUT BACK TO THE DECK!");
                         _gameEngine.State.CardDeck.Cards.Add(_gameEngine.State.DiscardedCards.First());
                         _gameEngine.State.DiscardedCards.RemoveAt(0);
+                        //initialize new discard pile
                         _gameEngine.InitializeDiscardPile();
                     }
+                    //if previous player made this move then next player takes 4 cards and is skipped
                     if (_gameEngine.State.TurnResult != ETurnResult.DrewCard && 
                         _gameEngine.State.TurnResult != ETurnResult.GameStart)
                     {
-                        //if previous player made this move then next player takes 4 cards and is skipped
                         Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
                                           + $" takes 4 cards and misses his turn! ");
                         _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
                             PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(4));
+                        //modify turnresult
                         _gameEngine.State.TurnResult = ETurnResult.DrewCard;
+                        //next player 
                         _gameEngine.NextPlayer();
                     }
-                    //if previous player drew a card then next player makes their move
-                    _gameEngine.PlayerMove();
                 }
-                //if it is a number card
-                if (_gameEngine.State.DiscardedCards.Last().CardValue != ECardValues.Wild 
-                    && _gameEngine.State.DiscardedCards.Last().CardValue != ECardValues.DrawFour 
-                    && _gameEngine.State.DiscardedCards.Last().CardValue != ECardValues.DrawTwo 
-                    && _gameEngine.State.DiscardedCards.Last().CardValue != ECardValues.Reverse 
-                    && _gameEngine.State.DiscardedCards.Last().CardValue != ECardValues.Skip
-                    && !_gameEngine.IsHandFinished())
-                {
-                    //modify turnResult and make a move
-                    _gameEngine.State.TurnResult = ETurnResult.OnGoing;
-                    _gameEngine.PlayerMove();
-                }
-                //TODO new hand and game generation
-                _gameEngine.HandDone = _gameEngine.IsHandFinished();
-                _gameEngine.GameDone = _gameEngine.IsGameOver();
-
-            }
-            //check if gameOver
-            if (_gameEngine.GameDone)
-            {
-                Console.WriteLine("Game is closing!");
-                break;
+                //player makes a move after all the previous special cases are checked
+                _gameEngine.PlayerMove();
+                //state is saved after every move
+                _gameRepository.SaveGame(_gameEngine.State.Id, _gameEngine.State);
             }
         }
         return null;

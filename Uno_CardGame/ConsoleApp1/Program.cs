@@ -10,9 +10,9 @@ Console.OutputEncoding = Encoding.UTF8;
 //define gameRepository
 var gameRepository = new GameRepositoryFileSystem();
 //define gameEngine
-var game = new GameEngine<string>(gameRepository);
+var game = new GameEngine(gameRepository);
 //define gameController
-var gameController = new GameController<string>(game);
+var gameController = new GameController(game,gameRepository);
 //method for setting playerCount 
 string setPlayerCount()
 {
@@ -181,23 +181,61 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
         "Load game", 
         null,
         "l", 
-        loadGame),
+        LoadGame),
     new MenuItem(
         "Options", 
         null,
         "o", 
         runOptionsMenu),
 });
-//TODO doesn't work if game is quit MidGame and tried to load back up again
-string loadGame()
+
+//method for loading locally saved games
+string? LoadGame()
 {
-    game.State = game.LoadGame();
-    game.State.TurnResult = ETurnResult.LoadGame;
-    game.GameDone = false;
+    //get locally saved json files as a list and show them on console one bye one
+    Console.WriteLine("Saved games");
+    var saveGameList = gameRepository.GetSaveGames();
+    var saveGameListDisplay = saveGameList.Select((s, i) => (i + 1) + " - " + s).ToList();
+
+    if (saveGameListDisplay.Count == 0) return null;
+    Guid gameId;
+    //ask the player what game to load until they insert valid choice
+    while (true)
+    {
+        Console.WriteLine(string.Join("\n", saveGameListDisplay));
+        Console.Write($"Select game to load (1..{saveGameListDisplay.Count}):");
+        var userChoiceStr = Console.ReadLine();
+        if (int.TryParse(userChoiceStr, out var userChoice))
+        {
+            if (userChoice < 1 || userChoice > saveGameListDisplay.Count)
+            {
+                Console.WriteLine("Not in range...");
+                continue;
+            }
+
+            gameId = saveGameList[userChoice - 1].id;
+            Console.WriteLine($"Loading file: {gameId}");
+
+            break;
+        }
+
+        Console.WriteLine("Parse error...");
+    }
+    //generate a gamestate from selected json file
+    var gameState = gameRepository.LoadGame(gameId);
+    //generate a gameengine from previously generated state
+    var gameEngine = new GameEngine(gameRepository)
+    {
+        State = gameState
+    };
+    gameEngine.State.TurnResult = ETurnResult.LoadGame;
+    //generate gamecontroller from gameengine and gamerepository
+    var gameController = new GameController(gameEngine, gameRepository);
+    //run the game
     gameController.MainLoop();
     return null;
 }
-//run the consoleApp 
+//run the mainMenu 
 mainMenu.Run();
 
 

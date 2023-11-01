@@ -4,6 +4,7 @@ namespace Domain;
 //gamestate class for saving the game
 public class GameState
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public List<Player> Players { get; set; }
     public int ActivePlayerNo { get; set; }
     //carddeck default size as 1

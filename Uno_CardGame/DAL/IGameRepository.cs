@@ -2,8 +2,10 @@ using Domain;
 
 namespace DAL;
 //saving game locally
-public interface IGameRepository<TKey>
+public interface IGameRepository
 {
-    TKey SaveGame(object? id, GameState game);
-    GameState LoadGame(object? id);
+    void SaveGame(Guid id, GameState game);
+    //list of locally saved games
+    List<(Guid id, DateTime dt)> GetSaveGames();
+    GameState LoadGame(Guid id);
 }

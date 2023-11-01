@@ -3,16 +3,18 @@ using Domain;
 namespace UnoEngine;
 
 //gameEngine class
-public class GameEngine<TKey>
+public class GameEngine
 {//gameEngine attributes: gameRepo, State and initialHandSize of the player
-    public IGameRepository<TKey> GameRepository { get; set; }
+    public IGameRepository GameRepository { get; set; }
     public GameState State { get; set; } = new GameState();
+    //modify starting hand size
     private const int InitialHandSize = 2;
+    
     public bool GameDone { get; set; }
     public bool HandDone { get; set; }
 
     //gameEngine constructor
-    public GameEngine(IGameRepository<TKey> repository)
+    public GameEngine(IGameRepository repository)
     {//create repository, cardDeck, default Players, playerHand and discardPile
         GameRepository = repository;
         State.ActivePlayerNo = 0;
@@ -27,6 +29,7 @@ public class GameEngine<TKey>
         InitializeFullDeck();
         InitializePlayerHand();
         InitializeDiscardPile();
+        HandDone = false;
     }
 //method for initializing a new carddeck
     private void InitializeFullDeck()
@@ -86,74 +89,63 @@ public class GameEngine<TKey>
 
         State.DeclaredColor = State.DiscardedCards.Last().CardColor;
     }
-    //method to save a game
-    //@this moment id = fileName
-    //while saving and id = null, then fileName = uno-" + DateTime.Now.ToFileTime() + ".json"
-    public void SaveGame()
-    {
-        GameRepository.SaveGame(1, State);
-    }
-    //method to load a game
-    public GameState LoadGame()
-    {
-        return GameRepository.LoadGame(1);
-    }
+
     //playerMove method
     public void PlayerMove()
     {
         var correctInput = false;
+        var choice = "";
+        //ask for the active players move in a loop
         do
         {
             //define player handSize
             var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
             Console.WriteLine($"<======== {State.Players[State.ActivePlayerNo].NickName }" + $"'s TURN ========>");
-            //in a loop shows the activePlayer 
+            //show discard pile and players hand
             ShowDiscardPile();
             Console.WriteLine($"{State.Players[State.ActivePlayerNo].NickName }" + $"'s cards on hand: ");
             ShowPlayerHand();
             Console.WriteLine("<===================>");
             Console.Write("Choose your card: ");
-            var choice = Console.ReadLine().ToLower().Trim();
+            choice = Console.ReadLine().ToLower().Trim();
+            //if player chooses to quit, then break the loop
             if (choice == "q")
             {
                 Console.WriteLine("Game shuts down!");
-                SaveGame();
-                GameDone = true;
-                correctInput = true;
+                break;
             }
+            //if player wants to draw
             if (choice == "d")
             {
                 Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew a new card!");
                 State.Players[State.ActivePlayerNo].PlayerHand.AddRange(State.CardDeck.Draw(1));
-                
+                //modify turnResult
                 State.TurnResult = ETurnResult.DrewCard;
-                
+                //check if they are able to play the card
                 if (CheckValidity(State.DiscardedCards.Last(),
                         State.Players[State.ActivePlayerNo].PlayerHand.Last()))
                 {
                     Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " plays the new card:  "
                         + State.Players[State.ActivePlayerNo].PlayerHand.Last().ToString2());
-                    
+                    //modify turnResult again if they are able to play the card
                     State.TurnResult = ETurnResult.OnGoing;
-                    
+                    //actually play the card
                     PlayCard(State.Players[State.ActivePlayerNo].PlayerHand.Count - 1);
+                    //check for wild card and declare new color if TRUE
                     if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
                     {
                         DeclareColor();
                     }
-                    
                 }
-                if (!IsHandFinished())
-                {
-                    NextPlayer();
-                }
-                
                 correctInput = true;
             }
+            //if player wrote something else in console (except "q" or "d")
             else
             {
+                //check if it was a number and smaller or equal than the amount of cards on hand
                 if (int.TryParse(choice, out var position) && position > 0 && position <= handSize)
                 {
+                    //check if it is a legal move
                     if (!CheckValidity(State.DiscardedCards.Last(),
                             State.Players[State.ActivePlayerNo].PlayerHand[position - 1]))
                     {
@@ -163,27 +155,46 @@ public class GameEngine<TKey>
                     {
                         Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played "
                             + State.Players[State.ActivePlayerNo].PlayerHand[position - 1].ToString2());
-
+                        //play the card and declare color if it is a wild card
                         PlayCard(position - 1);
-                        //check if played card is wild
+                        
                         if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
                         {
                             DeclareColor();
                         }
-                        if (!IsHandFinished())
-                        {
-                            NextPlayer();
-                        }
                     }
+                    //if a move was actually made then modify TurnResult
                     State.TurnResult = ETurnResult.OnGoing;
                     correctInput = true;
                 }
+                //no valid moves were made, start again
                 else
                 {
                     Console.WriteLine("Undefined shortcut....");
                 }
             }
         } while (!correctInput);
+        //if player chose quit then both hand and game will be over
+        if (choice == "q")
+        {
+            HandDone = true;
+            GameDone = true;
+        }
+        //if player drew or played a card
+        else
+        {
+            //if hand is not finished then continue with another player
+            if (!IsHandFinished())
+            {
+                NextPlayer();
+            }
+            //if hand is finished then check if the game is over
+            else
+            {
+                HandDone = true;
+                GameDone = IsGameOver();
+            }
+        }
     }
 //method to show playerHand on console
     public void ShowPlayerHand()
@@ -196,12 +207,12 @@ public class GameEngine<TKey>
         Console.WriteLine("d) draw a card");
         Console.WriteLine("q) quit & save game");
     }
-
+    //show discardPile on console
     public void ShowDiscardPile()
     {
         Console.WriteLine("Card on top of discard pile: |" + State.DiscardedCards.Last() + "|");
     }
-  
+  //method for declaring the color after a wild card is played
     public void DeclareColor()
     {
         bool correctInput = false;
@@ -240,18 +251,18 @@ public class GameEngine<TKey>
                 Console.WriteLine("Undefined shortcut...");
             }
         } while (correctInput == false);
-        SaveGame();
+        
         ShowDiscardPile();
     }
-
+    //method for playing the card
     public void PlayCard(int position)
     {
         var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[position];
         State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(position);
         State.DiscardedCards.Add(playedCard);
-        SaveGame();
+        
     }
-
+    //method for valid move check
     public bool CheckValidity(GameCard discarded, GameCard choice)
     {
         if (discarded.CardValue == choice.CardValue ||
@@ -305,7 +316,6 @@ public class GameEngine<TKey>
             Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " has 0 cards left! ");
             CalculateScore();
             State.TurnResult = ETurnResult.GameStart;
-            UpdateGame();
             return true;
         }
         if (State.CardDeck.Size == 0)
@@ -313,7 +323,6 @@ public class GameEngine<TKey>
             Console.WriteLine("Card deck is empty!  ");
             CalculateScore();
             State.TurnResult = ETurnResult.GameStart;
-            UpdateGame();
             return true;
         }
         return false;
