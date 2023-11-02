@@ -35,8 +35,10 @@ public class GameRepositoryFileSystem : IGameRepository
         //return fileName;
     }
 
+    //return a list tuples of saveGames with the last write time 
     public List<(Guid id, DateTime dt)> GetSaveGames()
     {
+        //get list of file names
         var data = Directory.EnumerateFiles(SaveLocation);
         var res = data
             .Select(

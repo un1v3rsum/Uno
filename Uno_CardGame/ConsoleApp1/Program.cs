@@ -3,16 +3,38 @@ using DAL;
 using Domain;
 using UnoEngine;
 using MenuSystem;
+using Microsoft.EntityFrameworkCore;
 using UnoConsoleUI;
+
+//DATABASES lectures 20.10 (sql statements and logger) & 27.10 (game db)
+//*entity framework has entity tracking attribute (has a reference to an object "somewhere" and tracks it )
+//if we fetched some kind of data from db then for a while some data is stored in memory
+//sometimes smth works and sometimes it doesn't (tracking can be switched off, makes code a bit faster)
 
 //encoding for emoji output
 Console.OutputEncoding = Encoding.UTF8;
-//define gameRepository
-var gameRepository = new GameRepositoryFileSystem();
-//define gameEngine
+//define gameRepository (local)
+//var gameRepository = new GameRepositoryFileSystem();
+
+//create contextOptions
+var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
+    .UseSqlite("Data Source=app.db")
+    .EnableDetailedErrors()
+    .EnableDetailedErrors()
+    .Options;
+
+//if used as "using var db" then system disposes db connection automatically
+//if this codeblock is over (no db.dispose() necessary)
+using var db = new AppDbContext(contextOptions);
+//create database and do the migrations
+db.Database.Migrate();
+//create gamerepository in db
+IGameRepository gameRepository = new GameRepositoryEF(db);
+//create gameEngine
 var game = new GameEngine(gameRepository);
-//define gameController
+//create gameController
 var gameController = new GameController(game,gameRepository);
+
 //method for setting playerCount 
 string setPlayerCount()
 {
