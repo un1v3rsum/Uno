@@ -6,51 +6,39 @@ namespace UnoConsoleUI;
 
 public class GameController
 {
+    //declare gamecontroller attributes (engine & repo)
     private readonly GameEngine _gameEngine;
     private readonly IGameRepository _gameRepository;
+    //constructor takes 2 parameters
     public GameController(GameEngine gameEngine, IGameRepository gameRepository)
     {
         _gameEngine = gameEngine;
         _gameRepository = gameRepository;
     }
+    //game mainloop
     public string? MainLoop()
     {
-        //@start of the game clears the console from prev menusystem
-        Console.Clear();
-        Console.WriteLine(_gameEngine.State.TurnResult == ETurnResult.LoadGame
-        //loading previous game
-            ? "<======== LOADING PREVIOUS GAME ========>"
-            //new game
-            : "<============ NEW GAME ============>");
+        //start new game
+        _gameEngine.StartGame();
         //first level loop for the game
         while (!_gameEngine.GameDone)
         {
-            if (_gameEngine.State.TurnResult != ETurnResult.LoadGame)
-            {
-                _gameEngine.UpdateGame();
-                //loading new hand
-                Console.WriteLine("<======== STARTING NEW HAND =======>");
-                Console.WriteLine("First card in discard-pile: " + 
-                                  _gameEngine.State.DiscardedCards.First());
-            }
-            else
-            {
-                //loading previous game from load game
-                Console.WriteLine("<====== RELOADING PREVIOUS HAND =====>");
-            }
+            //start game hand
+            _gameEngine.StartHand();
             //second level loop for the hand - remains true if one of the next attributes is false
             while (!_gameEngine.HandDone)
             {
                 //if the card on top of the discardpile is SKIP
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)
                 {
-                    //if previous player made the move and didn't draw a card, then next player is skipped
-                    if (_gameEngine.State.TurnResult != ETurnResult.DrewCard)
+                    //if previous player made the move and didn't draw a card, then next player is skipped & it's not a loadgame
+                    if (_gameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                        _gameEngine.State.TurnResult != ETurnResult.LoadGame)
                     {
                         //if previous player made the move and didn't draw a card and next player in line is changed
                         Console.WriteLine("Last card played was SKIP.");
-                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                          + $"misses his turn! ");
+                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo]
+                                                            .NickName } " + $"misses his turn! ");
                         _gameEngine.NextPlayer();
                     }
                 }
@@ -58,12 +46,15 @@ public class GameController
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Reverse)
                 {
                     //if previous player made the move and didn't draw a card and next player in line is changed
-                    if (_gameEngine.State.TurnResult != ETurnResult.DrewCard)
+                    if (_gameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                        _gameEngine.State.TurnResult != ETurnResult.LoadGame)
                     {
                         //then gameDirection is reversed
-                        Console.WriteLine("Last card played was REVERSE. Direction will be set to counterclockwise!");
                         _gameEngine.SetGameDirection();
                         //and next player is picked
+                        //since PlayerMove() already went over to next player before gamedirection was set, 
+                        //then we go back to the player before Reverse card player
+                        _gameEngine.NextPlayer();
                         _gameEngine.NextPlayer();
                     }
                 }
@@ -71,17 +62,14 @@ public class GameController
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
                 {
                     //if previous player made the move and didn't draw a card
-                    if (_gameEngine.State.TurnResult != ETurnResult.DrewCard)
+                    if (_gameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                        _gameEngine.State.TurnResult != ETurnResult.LoadGame)
                     {
                         //then next player takes two cards and is skipped
                         Console.WriteLine("Last card played was DRAW-TWO.");
-                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                          + $" takes 2 cards and misses his turn! ");
-                        _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
-                            PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(2));
-                        //turnResult is modified to Drew
-                        _gameEngine.State.TurnResult = ETurnResult.DrewCard;
-                        //next player is picked
+                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo]
+                                                        .NickName} " + $"misses his turn! ");
+                        _gameEngine.DrewCard(2);
                         _gameEngine.NextPlayer();
                     }
                 }
@@ -91,7 +79,6 @@ public class GameController
                     //if it is the start of the game, then first player picks the color & makes their move
                     if (_gameEngine.State.TurnResult == ETurnResult.GameStart)
                     {
-                        _gameEngine.State.TurnResult = ETurnResult.OnGoing;
                         _gameEngine.DeclareColor();
                     }
                     //if it is an ongoing game then color declaration was already done by the previous player
@@ -111,15 +98,12 @@ public class GameController
                     }
                     //if previous player made this move then next player takes 4 cards and is skipped
                     if (_gameEngine.State.TurnResult != ETurnResult.DrewCard && 
-                        _gameEngine.State.TurnResult != ETurnResult.GameStart)
+                        _gameEngine.State.TurnResult != ETurnResult.LoadGame)
                     {
-                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].NickName } " 
-                                          + $" takes 4 cards and misses his turn! ");
-                        _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].
-                            PlayerHand.AddRange(_gameEngine.State.CardDeck.Draw(4));
-                        //modify turnresult
-                        _gameEngine.State.TurnResult = ETurnResult.DrewCard;
-                        //next player 
+                        Console.WriteLine("Last card played was WILD-DRAW-FOUR.");
+                        Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo]
+                                                .NickName} " + $"misses his turn! ");
+                        _gameEngine.DrewCard(4);
                         _gameEngine.NextPlayer();
                     }
                 }

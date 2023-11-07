@@ -13,6 +13,7 @@ using UnoConsoleUI;
 
 //encoding for emoji output
 Console.OutputEncoding = Encoding.UTF8;
+
 //define gameRepository (local)
 //var gameRepository = new GameRepositoryFileSystem();
 
@@ -158,7 +159,6 @@ string? runOptionsMenu()
                 "t", 
                 null
             ),
-            
         }
     );
     
@@ -257,6 +257,7 @@ string? LoadGame()
     gameController.MainLoop();
     return null;
 }
+
 //run the mainMenu 
 mainMenu.Run();
 

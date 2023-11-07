@@ -1,9 +1,13 @@
+using System;
+
 namespace MenuSystem;
 //menu class
 public class Menu
 {
     private readonly EMenuLevel Level;
     public string? Title { get; set; }
+    
+    public List<MenuItem> mItems { get; set; }
     //container for menuItems
     public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
     private const string MenuSeparator = "=======================";
@@ -11,9 +15,21 @@ public class Menu
     private const string ShortcutBack = "b";
     private const string ShortcutReturnToMain = "r";
     //private menuItems, not accessible by the player 
-    private readonly MenuItem menuItemExit = new MenuItem("Exit",null, ShortcutExit, null);
-    private readonly MenuItem menuItemBack = new MenuItem("Back",null, ShortcutBack, null);
-    private readonly MenuItem menuItemReturnToMain = new MenuItem("Return to Main", null, ShortcutReturnToMain, null);
+    private readonly MenuItem menuItemExit = new MenuItem(
+        "Exit",
+        null, 
+        ShortcutExit, 
+        null);
+    private readonly MenuItem menuItemBack = new MenuItem(
+        "Back",
+        null, 
+        ShortcutBack, 
+        null);
+    private readonly MenuItem menuItemReturnToMain = new MenuItem(
+        "Return to Main", 
+        null, 
+        ShortcutReturnToMain, 
+        null);
     
     public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
@@ -57,14 +73,14 @@ public class Menu
             Console.WriteLine(menuItem.Value.MenuLabelFunction != null
                 //then execute the function
                 ? menuItem.Value.MenuLabelFunction()
-                //otherwise show menulabel
+                //otherwise show menuLabel
                 : menuItem.Value.MenuLabel);
         }
         Console.WriteLine(MenuSeparator);
         Console.Write("Your choice:");
     }
     //method for running the menuSystem
-    public string Run()
+    public string? Run()
     {   
         //clear the buffer
         Console.Clear();
@@ -79,23 +95,27 @@ public class Menu
             if (MenuItems.ContainsKey(userChoice))
             {
                 string? result = null;
+                
                 if (MenuItems[userChoice].MethodToRun != null)
                 {
                     result = MenuItems[userChoice].MethodToRun!();
                 }
+                
                 if (userChoice == ShortcutBack)
                 {
                     menuDone = true;
                 }
 
-                if (userChoice == ShortcutExit || result == ShortcutExit)
+                if (userChoice == ShortcutExit ||
+                    result == ShortcutExit)
                 {
-                    //if result != null -> uses result, else uses userChoice
+                    //if result != null -> uses result, else use userChoice
                     userChoice = result ?? userChoice;
                     menuDone = true;
                 }
 
-                if ((userChoice == ShortcutReturnToMain || result == ShortcutReturnToMain) && Level != EMenuLevel.First)
+                if ((userChoice == ShortcutReturnToMain || result == ShortcutReturnToMain) 
+                                && Level != EMenuLevel.First)
                 {
                     //if result != null -> uses result, else uses userChoice
                     userChoice = result ?? userChoice;
@@ -106,6 +126,7 @@ public class Menu
             {
                 Console.WriteLine("Undefined shortcut....");
             }
+            
             Console.WriteLine();
             //menuSystem stops running if menuDone = true
         } while (menuDone == false);

@@ -8,8 +8,7 @@ public class GameEngine
     public IGameRepository GameRepository { get; set; }
     public GameState State { get; set; } = new GameState();
     //modify starting hand size
-    private const int InitialHandSize = 2;
-    
+    private const int InitialHandSize = 7;
     public bool GameDone { get; set; }
     public bool HandDone { get; set; }
 
@@ -77,7 +76,7 @@ public class GameEngine
             }
         }
     }
-//method for creating a discard pile
+    //method for creating a discard pile
     public void InitializeDiscardPile()
     {
         //new list of discardedCards 
@@ -86,28 +85,23 @@ public class GameEngine
         State.DiscardedCards.Add(State.CardDeck.Cards.First());
         //remove it from carddeck
         State.CardDeck.Cards.RemoveAt(0);
-
         State.DeclaredColor = State.DiscardedCards.Last().CardColor;
     }
 
     //playerMove method
     public void PlayerMove()
     {
+        //define boolean for the loop and playerchoice
         var correctInput = false;
         var choice = "";
         //ask for the active players move in a loop
         do
         {
+            StartPlayerMove();
             //define player handSize
             var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
-            Console.WriteLine($"<======== {State.Players[State.ActivePlayerNo].NickName }" + $"'s TURN ========>");
-            //show discard pile and players hand
-            ShowDiscardPile();
-            Console.WriteLine($"{State.Players[State.ActivePlayerNo].NickName }" + $"'s cards on hand: ");
-            ShowPlayerHand();
-            Console.WriteLine("<===================>");
-            Console.Write("Choose your card: ");
-            choice = Console.ReadLine().ToLower().Trim();
+            //read in the choice from console
+            choice = Console.ReadLine()!.ToLower().Trim();
             //if player chooses to quit, then break the loop
             if (choice == "q")
             {
@@ -117,18 +111,11 @@ public class GameEngine
             //if player wants to draw
             if (choice == "d")
             {
-                Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew a new card!");
-                State.Players[State.ActivePlayerNo].PlayerHand.AddRange(State.CardDeck.Draw(1));
-                //modify turnResult
-                State.TurnResult = ETurnResult.DrewCard;
+                DrewCard(1);
                 //check if they are able to play the card
                 if (CheckValidity(State.DiscardedCards.Last(),
                         State.Players[State.ActivePlayerNo].PlayerHand.Last()))
                 {
-                    Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " plays the new card:  "
-                        + State.Players[State.ActivePlayerNo].PlayerHand.Last().ToString2());
-                    //modify turnResult again if they are able to play the card
-                    State.TurnResult = ETurnResult.OnGoing;
                     //actually play the card
                     PlayCard(State.Players[State.ActivePlayerNo].PlayerHand.Count - 1);
                     //check for wild card and declare new color if TRUE
@@ -153,8 +140,6 @@ public class GameEngine
                     }
                     else
                     {
-                        Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " played "
-                            + State.Players[State.ActivePlayerNo].PlayerHand[position - 1].ToString2());
                         //play the card and declare color if it is a wild card
                         PlayCard(position - 1);
                         
@@ -163,8 +148,6 @@ public class GameEngine
                             DeclareColor();
                         }
                     }
-                    //if a move was actually made then modify TurnResult
-                    State.TurnResult = ETurnResult.OnGoing;
                     correctInput = true;
                 }
                 //no valid moves were made, start again
@@ -202,7 +185,7 @@ public class GameEngine
         //Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + "'s turn. Cards on hand: ");
         for (int i = 0; i < State.Players[State.ActivePlayerNo].PlayerHand.Count; i++)
         {
-            Console.WriteLine((i+1) + ") |" + State.Players[State.ActivePlayerNo].PlayerHand[i].ToString() + "| ");
+            Console.WriteLine((i+1) + ") |" + State.Players[State.ActivePlayerNo].PlayerHand[i] + "| ");
         }
         Console.WriteLine("d) draw a card");
         Console.WriteLine("q) quit & save game");
@@ -225,7 +208,7 @@ public class GameEngine
             Console.WriteLine("3) " + ECardColor.Green.ToString());
             Console.WriteLine("4) " + ECardColor.Yellow.ToString());
             Console.Write($"Player ({State.Players[State.ActivePlayerNo].NickName }) " +$"declare a color: ");
-            var colorChoice = Console.ReadLine().ToLower().Trim();
+            var colorChoice = Console.ReadLine()!.ToLower().Trim();
             switch (colorChoice)
             {
                 case "1":
@@ -251,8 +234,6 @@ public class GameEngine
                 Console.WriteLine("Undefined shortcut...");
             }
         } while (correctInput == false);
-        
-        ShowDiscardPile();
     }
     //method for playing the card
     public void PlayCard(int position)
@@ -260,6 +241,11 @@ public class GameEngine
         var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[position];
         State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(position);
         State.DiscardedCards.Add(playedCard);
+        Console.WriteLine(State.Players[State.ActivePlayerNo].NickName 
+                          + " plays the new card:  "
+                          + playedCard.ToString2());
+        //modify turnResult 
+        State.TurnResult = ETurnResult.OnGoing;
         
     }
     //method for valid move check
@@ -274,10 +260,10 @@ public class GameEngine
         //WILD DRAW FOUR
         //else loop through playerHand and check if they have any cards that would match the discardpile
         if (choice.CardValue != ECardValues.DrawFour) return false;
-        foreach (var t in State.Players[State.ActivePlayerNo].PlayerHand)
+        foreach (var card in State.Players[State.ActivePlayerNo].PlayerHand)
         {
-            if (discarded.CardValue == t.CardValue || 
-                discarded.CardColor == t.CardColor)
+            if (discarded.CardValue == card.CardValue || 
+                discarded.CardColor == card.CardColor)
             {
                 return false;
             }
@@ -359,6 +345,56 @@ public class GameEngine
         State.GameDirection = (State.GameDirection == EGameDirection.ClockWise)
             ? EGameDirection.CounterClockWise
             : EGameDirection.ClockWise;
+        Console.WriteLine("Last card played was REVERSE. Direction will be set to " + State.GameDirection + "!");
+        State.TurnResult = ETurnResult.DrewCard;
+    }
+
+    public void DrewCard(int noOfCards)
+    {
+        Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew " + noOfCards + " card(s)!");
+        State.Players[State.ActivePlayerNo].PlayerHand.AddRange(State.CardDeck.Draw(noOfCards));
+        //modify turnResult
+        State.TurnResult = ETurnResult.DrewCard;
+    }
+
+    public void StartPlayerMove()
+    {
+        Console.WriteLine($"<======== {State.Players[State.ActivePlayerNo].NickName }" + $"'s TURN ========>");
+        //show discard pile and players hand
+        ShowDiscardPile();
+        //show player hand
+        Console.WriteLine($"{State.Players[State.ActivePlayerNo].NickName }" + $"'s cards on hand: ");
+        ShowPlayerHand();
+        Console.WriteLine("<===================>");
+        Console.Write("Choose your card: ");
+    }
+    //method for loading new game text on console
+    public void StartGame()
+    {
+        //@start of the game clears the console from prev menusystem
+        Console.Clear();
+        Console.WriteLine(State.TurnResult == ETurnResult.LoadGame
+            //loading previous game
+            ? "<======== LOADING PREVIOUS GAME ========>"
+            //new game
+            : "<============ NEW GAME ============>");
+    }
+    //method for loading new hand text on console
+    public void StartHand()
+    {
+        if (State.TurnResult != ETurnResult.LoadGame)
+        {
+            UpdateGame();
+            //loading new hand
+            Console.WriteLine("<======== STARTING NEW HAND =======>");
+            Console.WriteLine("First card in discard-pile: " + 
+                              State.DiscardedCards.First());
+        }
+        else
+        {
+            //loading previous game from load game
+            Console.WriteLine("<====== RELOADING PREVIOUS HAND =====>");
+        }
     }
     
 }
