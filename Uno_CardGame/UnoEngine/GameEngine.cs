@@ -87,8 +87,7 @@ public class GameEngine
         State.CardDeck.Cards.RemoveAt(0);
         State.DeclaredColor = State.DiscardedCards.Last().CardColor;
     }
-
-    //playerMove method
+    //playerMove method 
     public void PlayerMove()
     {
         //define boolean for the loop and playerchoice
@@ -100,8 +99,47 @@ public class GameEngine
             StartPlayerMove();
             //define player handSize
             var handSize = State.Players[State.ActivePlayerNo].PlayerHand.Count;
-            //read in the choice from console
-            choice = Console.ReadLine()!.ToLower().Trim();
+
+            //if HUMAN moves
+            if (State.Players[State.ActivePlayerNo].PlayerType == EPlayerType.Human)
+            {
+                //read in the choice from console
+                choice = Console.ReadLine()!.ToLower().Trim();
+            }
+            //if AI moves
+            else
+            {
+                //create container for valid cards
+                List<int> validCardPositions = new List<int>();
+                //loops through player cards
+                for (int i = 0; i < handSize; i++)
+                {
+                    //created container because:
+                    //*AI choice got lost in loop and wasnt accessible in lower lines*
+                    
+                    //finds valid card indexes and adds to container
+                    if (CheckValidity(State.DiscardedCards.Last(),
+                            State.Players[State.ActivePlayerNo].PlayerHand[i]))
+                    {
+                        validCardPositions.Add(i);
+                    }
+                }
+                //if no valid cards, then draw card
+                if (validCardPositions.Count == 0)
+                {
+                    Console.WriteLine("AI has no valid moves!");
+                    choice = "d";
+                }
+                else
+                {
+                    //picks a random valid card
+                    Console.WriteLine("AI's nr on valid moves: " + validCardPositions.Count);
+                    Random random = new Random();
+                    var randomValidCardPosition = validCardPositions[random.Next(0, validCardPositions.Count)];
+                    choice = (randomValidCardPosition+1).ToString();
+                }
+            }
+            
             //if player chooses to quit, then break the loop
             if (choice == "q")
             {
@@ -147,13 +185,13 @@ public class GameEngine
                         {
                             DeclareColor();
                         }
+                        correctInput = true;
                     }
-                    correctInput = true;
                 }
                 //no valid moves were made, start again
                 else
                 {
-                    Console.WriteLine("Undefined shortcut....");
+                    Console.WriteLine("Undefined shortcut (playermove)!");
                 }
             }
         } while (!correctInput);
@@ -199,6 +237,7 @@ public class GameEngine
     public void DeclareColor()
     {
         bool correctInput = false;
+        var colorChoice = "";
         do
         {
             State.TurnResult = ETurnResult.OnGoing;
@@ -208,7 +247,20 @@ public class GameEngine
             Console.WriteLine("3) " + ECardColor.Green.ToString());
             Console.WriteLine("4) " + ECardColor.Yellow.ToString());
             Console.Write($"Player ({State.Players[State.ActivePlayerNo].NickName }) " +$"declare a color: ");
-            var colorChoice = Console.ReadLine()!.ToLower().Trim();
+            
+            if (State.Players[State.ActivePlayerNo].PlayerType == EPlayerType.Human)
+            {
+                //read in the choice from console
+                colorChoice = Console.ReadLine()!.ToLower().Trim();
+            }
+            //if AI moves
+            else
+            {
+                //picks a random color
+                Random random = new Random();
+                colorChoice = random.Next(1, 5).ToString();
+            }
+             
             switch (colorChoice)
             {
                 case "1":
@@ -228,12 +280,13 @@ public class GameEngine
                     correctInput = true;
                     break;
             }
-
             if (!correctInput)
             {
-                Console.WriteLine("Undefined shortcut...");
+                Console.WriteLine("Undefined shortcut (declare color)!");
             }
         } while (correctInput == false);
+        Console.WriteLine($"Player ({State.Players[State.ActivePlayerNo].NickName }) " 
+                          +$"chose new color as: " + State.DiscardedCards.Last().CardColor);
     }
     //method for playing the card
     public void PlayCard(int position)

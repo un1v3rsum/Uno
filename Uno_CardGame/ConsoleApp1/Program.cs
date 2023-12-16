@@ -14,23 +14,30 @@ using UnoConsoleUI;
 //encoding for emoji output
 Console.OutputEncoding = Encoding.UTF8;
 
+//<<<================== LOCAL SAVE OPTIONS ===============>>>
 //define gameRepository (local)
-//var gameRepository = new GameRepositoryFileSystem();
+//*comment out*
+//var gameRepository = new GameRepositoryFileSystem(); 
+//<<<================== LOCAL SAVE OPTIONS ===============>>>
 
+
+//<<<====================== DATABASE SAVE OPTIONS ====================>>>
+//define gameRepository (db)
 //create contextOptions
 var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
     .UseSqlite("Data Source=app.db")
     .EnableDetailedErrors()
     .EnableDetailedErrors()
     .Options;
-
 //if used as "using var db" then system disposes db connection automatically
-//if this codeblock is over (no db.dispose() necessary)
+//no need for ->  db.dispose() afterwards
 using var db = new AppDbContext(contextOptions);
 //create database and do the migrations
 db.Database.Migrate();
 //create gamerepository in db
 IGameRepository gameRepository = new GameRepositoryEF(db);
+//<<<====================== DATABASE SAVE OPTIONS ====================>>>
+
 //create gameEngine
 var game = new GameEngine(gameRepository);
 //create gameController
@@ -125,7 +132,7 @@ string? setDeckSize()
     game.UpdateGame();
     return null;
 }
-//TODO 
+//method for changing the deck type
 string? setDeckType()
 {
     game.State.CardDeck.DeckType = (game.State.CardDeck.DeckType == ECardDeckType.Modern) 

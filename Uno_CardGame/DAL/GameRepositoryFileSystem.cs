@@ -21,18 +21,6 @@ public class GameRepositoryFileSystem : IGameRepository
             Directory.CreateDirectory(SaveLocation);
         }
         File.WriteAllText(Path.Combine(SaveLocation, fileName), content);
-
-       // var fileName = "";
-        //if (id != null)
-        //{ 
-         //   fileName = id.ToString() + ".json";
-        //}
-        //else
-        //{
-         //   fileName = "uno-" + DateTime.Now.ToFileTime() + ".json";
-        //}
-        //System.IO.File.WriteAllText(_filePrefix + fileName, JsonSerializer.Serialize(game));
-        //return fileName;
     }
 
     //return a list tuples of saveGames with the last write time 
@@ -47,9 +35,7 @@ public class GameRepositoryFileSystem : IGameRepository
                     File.GetLastWriteTime(path)
                 )
             ).ToList();
-        
         return res;
-
     }
 
     public GameState LoadGame(Guid id)
@@ -61,13 +47,6 @@ public class GameRepositoryFileSystem : IGameRepository
         if (res == null) throw new SerializationException($"Cannot deserialize {jsonStr}");
 
         return res;
-
     }
-
-    //public GameState LoadGame(object? id)
-    //{
-       // return JsonSerializer.Deserialize<GameState>(
-        //    System.IO.File.ReadAllText(_filePrefix + id + ".json")
-      //  )!;
-    //}
+    
 }
