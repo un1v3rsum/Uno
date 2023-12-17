@@ -18,20 +18,37 @@ public class GameController
     //game mainloop
     public string? MainLoop()
     {
-        //start new game
-        _gameEngine.StartGame();
+        //<<<<<================ VISUALIZE START OF GAME ===================>>>>>
+        ConsoleVizualisation.StartGame(_gameEngine.State);
+        
         //first level loop for the game
         while (!_gameEngine.GameDone)
         {
-            //start game hand
-            _gameEngine.StartHand();
+            //<<<<<================ VISUALIZE START OF HAND ===================>>>>>
+            if (_gameEngine.State.TurnResult != ETurnResult.LoadGame)
+            {
+                //update all the cards and player hands
+                _gameEngine.UpdateGame();
+            }
+            
+            //start game hand, waiter players confirmation
+            ConsoleVizualisation.StartHand(_gameEngine.State);
+            Console.WriteLine("Press any key to continue..");
+            Console.ReadLine();
+            
             //second level loop for the hand - remains true if one of the next attributes is false
             while (!_gameEngine.HandDone)
             {
-                //if the card on top of the discardpile is SKIP
+                //clear console, so that other players wouldn't see previous players cards on hand
+                Console.Clear();
+                
+                //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
+                
+                //<<<<<================ SKIP ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)
                 {
-                    //if previous player made the move and didn't draw a card, then next player is skipped & it's not a loadgame
+                    //if previous player made the move and didn't draw a card, then next player is skipped
+                    // & it's not a loadgame
                     if (_gameEngine.State.TurnResult != ETurnResult.DrewCard && 
                         _gameEngine.State.TurnResult != ETurnResult.LoadGame)
                     {
@@ -42,7 +59,7 @@ public class GameController
                         _gameEngine.NextPlayer();
                     }
                 }
-                //if the card on top of the discardpile is REVERSE
+                //<<<<<================ REVERSE ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Reverse)
                 {
                     //if previous player made the move and didn't draw a card and next player in line is changed
@@ -58,7 +75,7 @@ public class GameController
                         _gameEngine.NextPlayer();
                     }
                 }
-                //if the card on top of the discardpile is DRAWTWO
+                //<<<<<================ DRAW-TWO ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
                 {
                     //if previous player made the move and didn't draw a card
@@ -73,7 +90,7 @@ public class GameController
                         _gameEngine.NextPlayer();
                     }
                 }
-                //if the card on top of the discardpile is REGULAR WILD CARD
+                //<<<<<================ WILD ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Wild)
                 {
                     //if it is the start of the game, then first player picks the color & makes their move
@@ -83,7 +100,7 @@ public class GameController
                     }
                     //if it is an ongoing game then color declaration was already done by the previous player
                 }
-                //if the card on top of the discardpile is WILD DRAW FOUR
+                //<<<<<================ WILD + DRAW FOUR ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour)
                 {
                     //if it is the first draw of the game
@@ -107,9 +124,71 @@ public class GameController
                         _gameEngine.NextPlayer();
                     }
                 }
-                //player makes a move after all the previous special cases are checked
-                _gameEngine.PlayerMove();
-                //state is saved after every move
+                //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
+                
+                
+                //next players turn, wait for confirmation
+                Console.WriteLine($"{_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo]
+                    .NickName} 's " + $"turn! Press any key to continue..");
+                Console.ReadLine();
+                Console.Clear();
+                
+                //vizualise next players hand
+                ConsoleVizualisation.StartPlayerMove(_gameEngine.State);
+                
+                //define active players handsize
+                var handSize = _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].PlayerHand.Count;
+                //boolean for loop
+                var correctInput = false;
+                var choice = "";
+                
+                //<<<<<================ AI PLAYER MAKES A CHOICE ===================>>>>>
+                if (_gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].PlayerType == EPlayerType.AI)
+                {
+                    //choice is made by AI
+                    choice = _gameEngine.AIMove();
+                }
+                //<<<<<================ HUMAN PLAYER MAKES A CHOICE ===================>>>>>
+                else
+                {
+                    //in a loop
+                    do
+                    {
+                        //read in the choice from console
+                        choice = Console.ReadLine()!.ToLower().Trim();
+                        //if player wants to draw or quit then break the loop
+                        if (choice is "d" or "q")
+                        {
+                            correctInput = true;
+                        }
+                        else // otherwise check if the pressed key was a number from 1 to the number of cards on hand
+                        {
+                            if (int.TryParse(choice, out var position) && position > 0 && position <= handSize)
+                            {
+                                //check if it is a legal move and break the loop
+                                if (_gameEngine.CheckValidity(_gameEngine.State.DiscardedCards.Last(),
+                                        _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo]
+                                            .PlayerHand[position - 1]))
+                                {
+                                    correctInput = true;
+                                }
+                                else //not a valid card, continue looping
+                                {
+                                    Console.WriteLine("This card cant be played!");
+                                }
+                            }
+                            else //if choice is not a valid number from 1 to the number of cards on hand
+                            {
+                                Console.WriteLine("Undefined shortcut (playermove)!");
+                                //and continue looping
+                            }
+                        }
+                    } while (!correctInput);
+                }
+                //<<<<<================ PLAYER MAKES AN ACTUAL MOVE ===================>>>>>
+                _gameEngine.MakeAMove(choice);
+                
+                //<<<<<================ SAVE GAME AFTER EVERY MOVE ===================>>>>>
                 _gameRepository.SaveGame(_gameEngine.State.Id, _gameEngine.State);
             }
         }
