@@ -92,10 +92,10 @@ public class GameEngine
     public string AIMove()
     {
         //create container for valid cards
-        List<int> validCardPositions = new List<int>();
+        var validCardPositions = new List<int>();
         var choice = "";
         //loops through player cards
-        for (int i = 0; i < State.Players[State.ActivePlayerNo].PlayerHand.Count; i++)
+        for (var i = 0; i < State.Players[State.ActivePlayerNo].PlayerHand.Count; i++)
         {
             //created container because:
             //*AI choice got lost in loop and wasn't accessible in lower lines*
@@ -116,7 +116,7 @@ public class GameEngine
         else
         {
             //picks a random valid card
-            Random random = new Random();
+            var random = new Random();
             var randomValidCardPosition = validCardPositions[random.Next(0, validCardPositions.Count)];
             choice = (randomValidCardPosition+1).ToString();
         }
@@ -177,8 +177,7 @@ public class GameEngine
   //method for declaring the color after a wild card is played
     public void DeclareColor()
     {
-        bool correctInput = false;
-        var colorChoice = "";
+        var correctInput = false;
         do
         {
             State.TurnResult = ETurnResult.OnGoing;
@@ -188,7 +187,8 @@ public class GameEngine
             Console.WriteLine("3) " + ECardColor.Green.ToString());
             Console.WriteLine("4) " + ECardColor.Yellow.ToString());
             Console.Write($"Player ({State.Players[State.ActivePlayerNo].NickName }) " +$"declare a color: ");
-            
+
+            var colorChoice = "";
             if (State.Players[State.ActivePlayerNo].PlayerType == EPlayerType.Human)
             {
                 //read in the choice from console
@@ -228,6 +228,8 @@ public class GameEngine
         } while (correctInput == false);
         Console.WriteLine($"Player ({State.Players[State.ActivePlayerNo].NickName }) " 
                           +$"chose new color as: " + State.DiscardedCards.Last().CardColor);
+        Console.WriteLine("Press any key to continue: ");
+        Console.ReadLine();
     }
     //method for playing the card
     public void PlayCard(int position)
@@ -236,8 +238,10 @@ public class GameEngine
         State.Players[State.ActivePlayerNo].PlayerHand.RemoveAt(position);
         State.DiscardedCards.Add(playedCard);
         Console.WriteLine(State.Players[State.ActivePlayerNo].NickName 
-                          + " plays the new card:  "
+                          + " plays card:  "
                           + playedCard.ToString2());
+        Console.WriteLine("Press any key to continue: ");
+        Console.ReadLine();
         //modify turnResult 
         State.TurnResult = ETurnResult.OnGoing;
     }
@@ -346,6 +350,8 @@ public class GameEngine
     {
         Console.WriteLine(State.Players[State.ActivePlayerNo].NickName + " drew " + noOfCards + " card(s)!");
         State.Players[State.ActivePlayerNo].PlayerHand.AddRange(State.CardDeck.Draw(noOfCards));
+        Console.WriteLine("Press any key to continue: ");
+        Console.ReadLine();
         //modify turnResult
         State.TurnResult = ETurnResult.DrewCard;
     }

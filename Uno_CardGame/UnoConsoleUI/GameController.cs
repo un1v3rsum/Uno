@@ -133,8 +133,6 @@ public class GameController
                 Console.ReadLine();
                 Console.Clear();
                 
-                //vizualise next players hand
-                ConsoleVizualisation.StartPlayerMove(_gameEngine.State);
                 
                 //define active players handsize
                 var handSize = _gameEngine.State.Players[_gameEngine.State.ActivePlayerNo].PlayerHand.Count;
@@ -154,6 +152,8 @@ public class GameController
                     //in a loop
                     do
                     {
+                        //vizualise next players hand
+                        ConsoleVizualisation.StartPlayerMove(_gameEngine.State);
                         //read in the choice from console
                         choice = Console.ReadLine()!.ToLower().Trim();
                         //if player wants to draw or quit then break the loop

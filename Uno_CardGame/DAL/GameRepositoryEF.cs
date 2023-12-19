@@ -27,6 +27,7 @@ public class GameRepositoryEF : IGameRepository
                 //for every player that is in the state, we want to convert it into a database player
                 Players = state.Players.Select(p => new Domain.Database.Player()
                 {
+                    Id = p.Id,
                     NickName = p.NickName,
                     PlayerType = p.PlayerType
                 }).ToList()

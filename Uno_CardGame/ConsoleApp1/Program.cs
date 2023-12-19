@@ -22,10 +22,15 @@ Console.OutputEncoding = Encoding.UTF8;
 
 
 //<<<====================== DATABASE SAVE OPTIONS ====================>>>
+
+//create connectionstring, so that it would work in everybodys computer
+var connectionString = "DataSource=<%temppath%>uno.db;Cache=Shared";
+connectionString = connectionString.Replace("<%temppath%>", Path.GetTempPath());
+
 //define gameRepository (db)
 //create contextOptions
 var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
-    .UseSqlite("Data Source=app.db")
+    .UseSqlite(connectionString)
     .EnableDetailedErrors()
     .EnableDetailedErrors()
     .Options;
@@ -80,9 +85,9 @@ string setPlayerCount()
 //method for changing players names and types
 string? editPlayerNamesAndTypes()
 {
-    for (int i = 0; i < game.State.Players.Count; i++)
+    for (var i = 0; i < game.State.Players.Count; i++)
     {
-        bool realType = false;
+        var realType = false;
         Console.Write("Enter " + (i+1) + ". player name: ");
         game.State.Players[i].NickName = Console.ReadLine();
         do
