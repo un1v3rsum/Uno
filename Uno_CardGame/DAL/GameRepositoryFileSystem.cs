@@ -6,28 +6,34 @@ using Helpers;
 namespace DAL;
 public class GameRepositoryFileSystem : IGameRepository
 {
-    private readonly string _filePrefix = "." + System.IO.Path.DirectorySeparatorChar;
-    private const string SaveLocation = "/Users/vladi/UnoGames";
-
-    //public string SaveGame(object? id, GameState game)
+    //find the savelocation from locally accessible folder
+    static string SaveLocation = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    //combine found path with "folderName"
+    private string saveGamesPath = System.IO.Path.Combine(SaveLocation, "UnoSaveGames");
+    
     public void SaveGame(Guid id, GameState state)
     {
-        var content = JsonSerializer.Serialize(state, JsonHelpers.JsonSerializerOptions);
-
+        //transform the state into json
+        var content = JsonSerializer.Serialize(state, JsonHelpers.JsonSerializerOptions);   
+        //create filename
         var fileName = Path.ChangeExtension(id.ToString(), ".json");
 
-        if (!Path.Exists(SaveLocation))
+        if (!Path.Exists(saveGamesPath))
         {
-            Directory.CreateDirectory(SaveLocation);
+            Directory.CreateDirectory(saveGamesPath);
         }
-        File.WriteAllText(Path.Combine(SaveLocation, fileName), content);
+        File.WriteAllText(Path.Combine(saveGamesPath, fileName), content);
     }
 
     //return a list tuples of saveGames with the last write time 
     public List<(Guid id, DateTime dt)> GetSaveGames()
     {
+        if (!Path.Exists(saveGamesPath))
+        {
+            Directory.CreateDirectory(saveGamesPath);
+        }
         //get list of file names
-        var data = Directory.EnumerateFiles(SaveLocation);
+        var data = Directory.EnumerateFiles(saveGamesPath);
         var res = data
             .Select(
                 path => (
@@ -42,7 +48,7 @@ public class GameRepositoryFileSystem : IGameRepository
     {
         var fileName = Path.ChangeExtension(id.ToString(), ".json");
 
-        var jsonStr = File.ReadAllText(Path.Combine(SaveLocation, fileName));
+        var jsonStr = File.ReadAllText(Path.Combine(saveGamesPath, fileName));
         var res = JsonSerializer.Deserialize<GameState>(jsonStr, JsonHelpers.JsonSerializerOptions);
         if (res == null) throw new SerializationException($"Cannot deserialize {jsonStr}");
 

@@ -17,7 +17,7 @@ public class GameCard
         return CardColor.ToString() + CardValueToString();
     }
     //method for giving string emoji values for CardColors
-    private string CardColorToString() =>
+    public string CardColorToString() =>
         CardColor switch
         {
             ECardColor.Blue => "🟦",
@@ -28,7 +28,7 @@ public class GameCard
             //ECardColor.Wild => "◼️"
         };
 //method for giving string values to CardValues
-    private string CardValueToString() =>
+    public string CardValueToString() =>
         CardValue switch
         {
             ECardValues.Zero => "0️",
@@ -41,11 +41,11 @@ public class GameCard
             ECardValues.Seven => "7",
             ECardValues.Eight => "8",
             ECardValues.Nine => "9",
-            ECardValues.Skip => "SKIP",
-            ECardValues.Reverse => "REVERSE",
+            ECardValues.Skip => "✘",
+            ECardValues.Reverse => "↺",
             ECardValues.DrawTwo => "+2",
-            ECardValues.Wild => "",
-            ECardValues.DrawFour => "+4",
+            ECardValues.Wild => "☢️",
+            ECardValues.DrawFour => "☢️4",
             ECardValues.ShuffleHands => "SHUFFLE",
             ECardValues.Customizable => "CUSTOMIZABLE"
         };

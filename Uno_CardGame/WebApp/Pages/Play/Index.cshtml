@@ -1,4 +1,83 @@
 @page
+@using Domain
 @model WebApp.Pages.Play.Index
 
-Play
+<head>
+    <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true"/>
+</head>
+
+<h11>Discard pile:</h11>
+<div class="uno-card">
+    <div class=@Model.gameEngine.State.DiscardedCards.Last().CardColor>
+        <h5 class="left-side">@Model.gameEngine.State.DiscardedCards.Last().CardValueToString()</h5>
+        <h5 class="right-side">@Model.gameEngine.State.DiscardedCards.Last().CardValueToString()</h5>
+        <div class="center">
+            <h1>@Model.gameEngine.State.DiscardedCards.Last().CardValueToString()</h1>
+        </div>
+    </div>
+    </div>
+
+
+
+<h5>Reload page in <span id="reload-label">-</span></h5>
+
+<h4>Active player: @Model.gameEngine.State.ActivePlayerNo - @Model.gameEngine.GetActivePlayer()</h4>
+
+@if (Model.gameEngine.GetActivePlayer().Id == Model.PlayerId)
+{
+    <div>You are active! Make your move!</div>
+}
+
+@if (Model.gameEngine.GetActivePlayer().Id != Model.PlayerId)
+{
+    <div>Not your move! Wait!</div>
+}
+
+
+<body>
+<div>
+  <button type="submit" value="Play card">Play card</button>
+  <button type="reset" value="Reset">Reset</button>
+  <button type="submit" value="Draw">Draw</button>  
+</div>
+<form>
+    @foreach (var card in Model.gameEngine.State.Players[Model.gameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
+    {
+        <div class="uno-card">
+            <div class=@card.CardColor>
+                <h5 class="left-side">@card.CardValueToString()
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                    <input style="float:right" type="radio" 
+                           id=@Model.gameEngine.GetCardPositionInPlayerHand(@card,Model.PlayerId) 
+                           name="playCard" value=@card>
+                    </h5>
+                <h5 class="right-side">@card.CardValueToString()</h5>
+                <div class="center">
+                    <h1>@card.CardValueToString()</h1>
+                </div>
+            </div>
+        </div>
+    }
+</form>
+
+
+</body>
+
+
+
+<!--script for reloading the page every 5 sec-->
+@section Scripts
+{
+    <script>
+        let timerValue = 15;
+        let timerLabel = document.querySelector("#reload-label");
+    
+        setInterval(() => {
+            timerValue--;
+            timerLabel.innerHTML = timerValue.toString();
+            if (timerValue<=0){
+                window.location.reload();
+            };
+        }, 1000);
+    </script>
+}

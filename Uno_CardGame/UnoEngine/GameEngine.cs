@@ -356,5 +356,36 @@ public class GameEngine
         State.TurnResult = ETurnResult.DrewCard;
     }
 
+    //method for getting the active player
+    public Player GetActivePlayer()
+    {
+        return State.Players[State.ActivePlayerNo];
+    }
+
+    public int GetPlayerIndex(Guid playerId)
+    {
+        int idx = default!;
+        for (var i = 0; i < State.Players.Count; i++)
+        {
+            if (State.Players[i].Id == playerId)
+            {
+                idx = i;
+            }
+        }
+        return idx;
+    }
+
+    public int GetCardPositionInPlayerHand(GameCard card, Guid playerId)
+    {
+        int idx = default!;
+        for (var i = 0; i < State.Players.Count; i++)
+        {
+            if (State.Players[i].Id == playerId)
+            {
+                idx = State.Players[i].PlayerHand.IndexOf(card);
+            }
+        }
+        return idx;
+    }
     
 }

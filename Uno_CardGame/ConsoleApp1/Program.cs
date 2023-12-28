@@ -15,9 +15,9 @@ using UnoConsoleUI;
 Console.OutputEncoding = Encoding.UTF8;
 
 //<<<================== LOCAL SAVE OPTIONS ===============>>>
-//define gameRepository (local)
-//*comment out*
-//var gameRepository = new GameRepositoryFileSystem(); 
+// //define gameRepository (local)
+// //*comment out*
+// var gameRepository = new GameRepositoryFileSystem(); 
 //<<<================== LOCAL SAVE OPTIONS ===============>>>
 
 
@@ -37,10 +37,10 @@ var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
 //if used as "using var db" then system disposes db connection automatically
 //no need for ->  db.dispose() afterwards
 using var db = new AppDbContext(contextOptions);
-//create database and do the migrations
-db.Database.Migrate();
+//create database and do the migrations if database doesnt already exist
+//db.Database.Migrate();
 //create gamerepository in db
-IGameRepository gameRepository = new GameRepositoryEF(db);
+var gameRepository = new GameRepositoryEF(db);
 //<<<====================== DATABASE SAVE OPTIONS ====================>>>
 
 //create gameEngine
@@ -223,15 +223,20 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
         runOptionsMenu),
 });
 
-//method for loading locally saved games
+//method for loading saved games
 string? LoadGame()
 {
-    //get locally saved json files as a list and show them on console one bye one
-    Console.WriteLine("Saved games");
     var saveGameList = gameRepository.GetSaveGames();
     var saveGameListDisplay = saveGameList.Select((s, i) => (i + 1) + " - " + s).ToList();
 
-    if (saveGameListDisplay.Count == 0) return null;
+    if (saveGameListDisplay.Count == 0)
+    {
+        Console.WriteLine("No saved games! Press any key to return!");
+        Console.ReadLine();
+        return null;
+    }
+    
+    Console.WriteLine("Saved games");
     Guid gameId;
     //ask the player what game to load until they insert valid choice
     while (true)

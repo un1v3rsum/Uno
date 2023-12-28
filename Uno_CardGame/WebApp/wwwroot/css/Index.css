@@ -1,0 +1,121 @@
+:root {
+    --primary-color: #07afd9;
+}
+
+body{
+    height: 100vh;
+    background-color: wheat;
+    display: grid;
+    place-items: center;
+    font-family: arial;
+}
+
+.uno-card{
+    display: inline-block;
+    padding: 10px;
+    place-items: center;
+    width: 210px;
+    height: 330px;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.Wild{
+    display: grid;
+    place-items: center;
+    padding: 15px;
+    width: 190px;
+    height: 310px;
+    border-radius: 15px;
+    background-color: black;
+}
+
+.Red{
+    display: grid;
+    place-items: center;
+    padding: 15px;
+    width: 190px;
+    height: 310px;
+    border-radius: 15px;
+    background-color: red;
+}
+
+.Blue{
+    display: grid;
+    place-items: center;
+    padding: 15px;
+    width: 190px;
+    height: 310px;
+    border-radius: 15px;
+    background-color: blue;
+}
+
+.Green{
+    display: grid;
+    place-items: center;
+    padding: 15px;
+    width: 190px;
+    height: 310px;
+    border-radius: 15px;
+    background-color: green;
+}
+
+.Yellow{
+    display: grid;
+    place-items: center;
+    padding: 15px;
+    width: 190px;
+    height: 310px;
+    border-radius: 15px;
+    background-color: yellow;
+}
+
+.center{
+    display: grid;
+    place-items: center;
+    position: absolute;
+    width: 140px;
+    height: 270px;
+    border: 8px solid white;
+    border-radius: 50%;
+    transform: rotate(36deg);
+}
+
+h1{
+    color: white;
+    font-size: 4rem;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 5px 2px black;
+    transform: rotate(-35deg);
+}
+
+h11{
+    color: white;
+    font-size: 4rem;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 5px 2px black;
+}
+
+h5 {
+    color: white;
+    font-size: 35px;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 3px 2px black;
+}
+
+.left-side{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: flex-start;
+}
+
+.right-side{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: flex-start;
+    transform: scale(-1,-1);
+}

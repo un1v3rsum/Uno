@@ -30,5 +30,7 @@ public class Index : PageModel
         {
             State = gameState
         };
+        
     }
+    
 }
