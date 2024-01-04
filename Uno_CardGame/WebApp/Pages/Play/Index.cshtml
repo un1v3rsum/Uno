@@ -1,5 +1,8 @@
 @page
 @using Domain
+@using DAL
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using UnoEngine
 @model WebApp.Pages.Play.Index
 
 <head>
@@ -18,7 +21,6 @@
     </div>
 
 
-
 <h5>Reload page in <span id="reload-label">-</span></h5>
 
 <h4>Active player: @Model.gameEngine.State.ActivePlayerNo - @Model.gameEngine.GetActivePlayer()</h4>
@@ -26,49 +28,45 @@
 @if (Model.gameEngine.GetActivePlayer().Id == Model.PlayerId)
 {
     <div>You are active! Make your move!</div>
-}
+    <div>
+        <button type="submit" value="Play card" onclick="">Play card</button>
+        <button type="submit" value="Draw" onclick="">Draw</button>
+    </div>
 
-@if (Model.gameEngine.GetActivePlayer().Id != Model.PlayerId)
-{
-    <div>Not your move! Wait!</div>
-}
-
-
-<body>
-<div>
-  <button type="submit" value="Play card">Play card</button>
-  <button type="reset" value="Reset">Reset</button>
-  <button type="submit" value="Draw">Draw</button>  
-</div>
-<form>
-    @foreach (var card in Model.gameEngine.State.Players[Model.gameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
+    @if (Model.gameEngine.GetActivePlayer().Id != Model.PlayerId)
     {
-        <div class="uno-card">
-            <div class=@card.CardColor>
-                <h5 class="left-side">@card.CardValueToString()
-                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    <input style="float:right" type="radio" 
-                           id=@Model.gameEngine.GetCardPositionInPlayerHand(@card,Model.PlayerId) 
-                           name="playCard" value=@card>
+        <div>Not your move! Wait!</div>
+    }
+
+    <body>
+    <form>
+        @foreach (var card in Model
+                      .gameEngine
+                      .State
+                      .Players[Model.gameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
+        {
+            <div class="uno-card">
+                <div class=@card.CardColor>
+                    <h5 class="left-side">@card.CardValueToString()
+                        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                        <input type="radio" name="playCard" value=@card
+                               disabled="@Model.gameEngine.CheckValidityHTML(Model.gameEngine.CheckValidity(Model.gameEngine.State.DiscardedCards.Last(), card))"
+                               id=@Model.gameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)>
                     </h5>
-                <h5 class="right-side">@card.CardValueToString()</h5>
-                <div class="center">
-                    <h1>@card.CardValueToString()</h1>
+                    <h5 class="right-side">@card.CardValueToString()</h5>
+                    <div class="center">
+                        <h1>@card.CardValueToString()</h1>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</form>
+        }
+    </form>
+    </body>
 
-
-</body>
-
-
-
-<!--script for reloading the page every 5 sec-->
-@section Scripts
-{
-    <script>
+    <!--script for reloading the page every 5 sec-->
+    @section Scripts
+    {
+        <script>
         let timerValue = 15;
         let timerLabel = document.querySelector("#reload-label");
     
@@ -80,4 +78,7 @@
             };
         }, 1000);
     </script>
+        ;
+    }
+
 }

@@ -1,3 +1,5 @@
+using UnoEngine;
+
 namespace UnoConsoleUI;
 using Domain;
 
@@ -46,6 +48,25 @@ public static class ConsoleVizualisation
     public static void ShowDiscardPile(GameState state)
     {
         Console.WriteLine("Card on top of discard pile: |" + state.DiscardedCards.Last() + "|");
+    }
+    //vizualise color declaration on console
+    public static void ShowDeclaringAColor(GameState state)
+    {
+        state.TurnResult = ETurnResult.OnGoing;
+        Console.WriteLine("WILD card was played!");
+        Console.WriteLine("1) " + ECardColor.Blue.ToString());
+        Console.WriteLine("2) " + ECardColor.Red.ToString());
+        Console.WriteLine("3) " + ECardColor.Green.ToString());
+        Console.WriteLine("4) " + ECardColor.Yellow.ToString());
+        Console.Write($"Player ({state.Players[state.ActivePlayerNo].NickName }) " +$"declare a color: ");
+    }
+    //vizualise new declared color on console
+    public static void ShowNewDeclaredColor(GameState state)
+    {
+        Console.WriteLine($"Player ({state.Players[state.ActivePlayerNo].NickName }) " 
+                          +$"chose new color as: " + state.DiscardedCards.Last().CardColor);
+        Console.WriteLine("Press any key to continue: ");
+        Console.ReadLine();
     }
     //method to show playerHand on console
     public static void ShowPlayerHand(GameState state)
