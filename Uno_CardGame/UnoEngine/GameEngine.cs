@@ -8,7 +8,7 @@ public class GameEngine
     public IGameRepository GameRepository { get; set; }
     public GameState State { get; set; } = new GameState();
     //modify starting hand size
-    private const int InitialHandSize = 2;
+    private const int InitialHandSize = 7;
     public bool GameDone { get; set; }
     public bool HandDone { get; set; }
 
@@ -24,7 +24,9 @@ public class GameEngine
     }
 //method for updating States - if game parameters are changed (no of players, deck size, players names/types)
     public void UpdateGame()
-    {//create new cardDeck, playerHand and discardPile
+    {
+        Console.WriteLine("do we update game?");
+        //create new cardDeck, playerHand and discardPile
         InitializeFullDeck();
         InitializePlayerHand();
         InitializeDiscardPile();
@@ -51,7 +53,7 @@ public class GameEngine
             new Player()
             {
                 NickName = "Mighty AI",
-                PlayerType = EPlayerType.AI,
+                PlayerType = EPlayerType.Ai,
                 Score = 0,
             },
         };
@@ -100,9 +102,10 @@ public class GameEngine
         State.DeclaredColor = State.DiscardedCards.Last().CardColor;
     }
     
-    //AI move
-    public string AIMove()
+    //AI choice
+    public string AiChoice()
     {
+        Console.WriteLine("AI no of card: " +  State.Players[State.ActivePlayerNo].PlayerHand.Count);
         //create container for valid cards
         var validCardPositions = new List<int>();
         var choice = "";
@@ -124,10 +127,11 @@ public class GameEngine
                 validCardPositions.Add(i);
             }
         }
+        Console.WriteLine("valid move count: " + validCardPositions.Count);
         //if no valid cards, then draw card
         if (validCardPositions.Count == 0)
         {
-            //Console.WriteLine("AI has no valid moves!");
+            Console.WriteLine("AI has no valid moves, DRAWS a CARD!");
             choice = "d";
         }
         else
@@ -135,13 +139,45 @@ public class GameEngine
             //picks a random valid card
             var random = new Random();
             var randomValidCardPosition = validCardPositions[random.Next(0, validCardPositions.Count)];
-            choice = (randomValidCardPosition+1).ToString();
+            Console.WriteLine("AI chosen index was: " + randomValidCardPosition);
+            Console.WriteLine("now we add + 1 to " + randomValidCardPosition);
+            choice = (randomValidCardPosition + 1).ToString();
+            Console.WriteLine("input sent by the AI to makeAmove(): "+choice);
         }
         return choice;
+    }
+
+    public void AiMove()
+    {
+        MakeAMove(AiChoice());
+        if (State.TurnResult == ETurnResult.DrewCard)
+        {
+            DrewCard(1);
+            //check if they are able to play the card
+
+            if (CheckValidity(State.DiscardedCards.Last(), 
+                    State.Players[State.ActivePlayerNo].PlayerHand.Last()))
+            {
+                //actually play the card
+                PlayCard(
+                        State
+                        .Players[State.ActivePlayerNo]
+                        .PlayerHand.Count - 1);
+                //If the played card was not a wild card then move on to next player
+                //if it was a wild card, then we want the active player to declare new color
+                if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+                {
+                    var random = new Random();
+                    var colorChoice = random.Next(1, 5).ToString();
+                    DeclareColor(colorChoice);
+                }
+            }
+        }
     }
     //method for making a valid move
     public void MakeAMove(string choice)
     {
+        Console.WriteLine(State.Players[State.ActivePlayerNo] + " gave input to MakeAMove(): " + choice);
         //if player chose to quit the game
         if (choice == "q")
         {
@@ -156,9 +192,12 @@ public class GameEngine
             {
                 //if player wants to draw then change the TurnResult
                 State.TurnResult = ETurnResult.DrewCard;
+                Console.WriteLine(State.Players[State.ActivePlayerNo] + " draws a card");
             }
             else
             {
+                Console.WriteLine("now should " + choice + " - 1");
+                Console.WriteLine("input that reaches for playCard(): " + (int.Parse(choice)-1));
                 //play the actual card
                 PlayCard(int.Parse(choice) - 1);
             }
@@ -167,6 +206,8 @@ public class GameEngine
   //method for declaring the color after a wild card is played
     public void DeclareColor(string colorChoice)
     {
+        Console.WriteLine("do we declare color?");
+        Console.WriteLine("who declares color: " + State.Players[State.ActivePlayerNo].NickName);
         switch (colorChoice)
         {
             case "1":
@@ -186,7 +227,12 @@ public class GameEngine
     //method for playing the card
     public void PlayCard(int position)
     {
+        Console.WriteLine("who plays card: " + State.Players[State.ActivePlayerNo].NickName);
+        Console.WriteLine("playcard() got the input: " + position);
+        Console.WriteLine("input is: "+position);
+        Console.WriteLine("playerhand length: " + State.Players[State.ActivePlayerNo].PlayerHand.Count);
         var playedCard = State.Players[State.ActivePlayerNo].PlayerHand[position];
+        Console.WriteLine("the chosen card is: " + playedCard.ToString());
         State
             .Players[State.ActivePlayerNo]
             .PlayerHand
@@ -202,10 +248,15 @@ public class GameEngine
     //method for valid move check
     public bool CheckValidity(GameCard discarded, GameCard choice)
     {
+        Console.WriteLine("do we control validity?");
+        Console.WriteLine("who checks validity: " + State.Players[State.ActivePlayerNo].NickName);
+        Console.WriteLine("discarded card was: " + discarded.ToString2());
+        Console.WriteLine("what card validity: " + choice.ToString2());
         if (discarded.CardValue == choice.CardValue ||
             discarded.CardColor == choice.CardColor ||
             choice.CardValue == ECardValues.Wild)
         {
+            Console.WriteLine("is VALID");
             return true;
         }
         //WILD DRAW FOUR
@@ -222,7 +273,7 @@ public class GameEngine
         return true;
     }
     //opposite boolean for HTML button disable function
-    public bool CheckValidityHTML(bool boolean){
+    public bool CheckValidityHtml(bool boolean){
         if (boolean) {
             return false;
         } return true;
@@ -246,6 +297,7 @@ public class GameEngine
     //game is over if a player has a score of 500 points
     public bool IsGameOver()
     {
+        Console.WriteLine("do we control gameOver?");
         if (State.Players[State.ActivePlayerNo].Score >= 500)
         {
             Console.WriteLine(State
@@ -260,6 +312,7 @@ public class GameEngine
     //hand is finished when a player has 0 cards in their hand or cardDeck is empty
     public bool IsHandFinished()
     {
+        Console.WriteLine("do we control handFinish?");
         if (State.Players[State.ActivePlayerNo].PlayerHand.Count == 0)
         {
             Console.WriteLine(State
@@ -282,7 +335,9 @@ public class GameEngine
     
     //method for setting the next player
     public void NextPlayer()
-    {   //if game goes clockwise and the activeplayerNo is less than the total of players
+    {   
+        Console.WriteLine("do we move on to next player");
+        //if game goes clockwise and the activeplayerNo is less than the total of players
         if (State.GameDirection == EGameDirection.ClockWise && 
             State.ActivePlayerNo < State.Players.Count - 1)
         {//increase the number

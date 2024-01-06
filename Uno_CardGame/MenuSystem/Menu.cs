@@ -4,10 +4,10 @@ namespace MenuSystem;
 //menu class
 public class Menu
 {
-    private readonly EMenuLevel Level;
+    private readonly EMenuLevel _level;
     public string? Title { get; set; }
     
-    public List<MenuItem> mItems { get; set; }
+    public List<MenuItem> MItems { get; set; }
     //container for menuItems
     public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
     private const string MenuSeparator = "=======================";
@@ -15,17 +15,17 @@ public class Menu
     private const string ShortcutBack = "b";
     private const string ShortcutReturnToMain = "r";
     //private menuItems, not accessible by the player 
-    private readonly MenuItem menuItemExit = new MenuItem(
+    private readonly MenuItem _menuItemExit = new MenuItem(
         "Exit",
         null, 
         ShortcutExit, 
         null);
-    private readonly MenuItem menuItemBack = new MenuItem(
+    private readonly MenuItem _menuItemBack = new MenuItem(
         "Back",
         null, 
         ShortcutBack, 
         null);
-    private readonly MenuItem menuItemReturnToMain = new MenuItem(
+    private readonly MenuItem _menuItemReturnToMain = new MenuItem(
         "Return to Main", 
         null, 
         ShortcutReturnToMain, 
@@ -33,7 +33,7 @@ public class Menu
     
     public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
-        Level = level;
+        _level = level;
         Title = title;
         foreach (var menuItem in menuItems)
         {   
@@ -49,12 +49,12 @@ public class Menu
         }
         //BACK not shown in the first level
         if (level != EMenuLevel.First)
-            MenuItems.Add(ShortcutBack, menuItemBack);
+            MenuItems.Add(ShortcutBack, _menuItemBack);
         //RETURN TO MAIN only shown in lower levels (not 1. & 2.)
         if (level == EMenuLevel.Other)
-            MenuItems.Add(ShortcutReturnToMain, menuItemReturnToMain);
+            MenuItems.Add(ShortcutReturnToMain, _menuItemReturnToMain);
         //EXIT seen in every level
-        MenuItems.Add(ShortcutExit, menuItemExit);
+        MenuItems.Add(ShortcutExit, _menuItemExit);
     }
     //method for drawing the menusystem
     private void Draw()
@@ -115,7 +115,7 @@ public class Menu
                 }
 
                 if ((userChoice == ShortcutReturnToMain || result == ShortcutReturnToMain) 
-                                && Level != EMenuLevel.First)
+                                && _level != EMenuLevel.First)
                 {
                     //if result != null -> uses result, else uses userChoice
                     userChoice = result ?? userChoice;

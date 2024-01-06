@@ -143,7 +143,7 @@ public class CardDeck
         }
     }
     //method to draw cards from deck, returns a list of cards
-    public List<GameCard> Draw(int count)
+    public IEnumerable<GameCard> Draw(int count)
     {
         //Enum.Take() - Returns a specified number of contiguous elements from the start of a sequence
         var cardsDrawn = Cards.Take(count).ToList();

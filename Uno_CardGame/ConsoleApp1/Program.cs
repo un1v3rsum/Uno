@@ -40,7 +40,7 @@ using var db = new AppDbContext(contextOptions);
 //create database and do the migrations if database doesnt already exist
 //db.Database.Migrate();
 //create gamerepository in db
-var gameRepository = new GameRepositoryEF(db);
+var gameRepository = new GameRepositoryEf(db);
 //<<<====================== DATABASE SAVE OPTIONS ====================>>>
 
 //create gameEngine
@@ -49,7 +49,7 @@ var game = new GameEngine(gameRepository);
 var gameController = new GameController(game,gameRepository);
 
 //method for setting playerCount 
-string setPlayerCount()
+string SetPlayerCount()
 {
     Console.WriteLine("Game can have 2 - 10 players.");
     bool correctCount = false;
@@ -83,7 +83,7 @@ string setPlayerCount()
     return null;
 }
 //method for changing players names and types
-string? editPlayerNamesAndTypes()
+string? EditPlayerNamesAndTypes()
 {
     for (var i = 0; i < game.State.Players.Count; i++)
     {
@@ -105,7 +105,7 @@ string? editPlayerNamesAndTypes()
                     realType = true;
                     break;
                 case "a":
-                    game.State.Players[i].PlayerType = EPlayerType.AI;
+                    game.State.Players[i].PlayerType = EPlayerType.Ai;
                     realType = true;
                     break;
             }
@@ -116,7 +116,7 @@ string? editPlayerNamesAndTypes()
 }
 
 //method for changing the deck size
-string? setDeckSize()
+string? SetDeckSize()
 {
     Console.WriteLine("Max 3 packs of cards can be used.");
     bool correctCount = false;
@@ -138,7 +138,7 @@ string? setDeckSize()
     return null;
 }
 //method for changing the deck type
-string? setDeckType()
+string? SetDeckType()
 {
     game.State.CardDeck.DeckType = (game.State.CardDeck.DeckType == ECardDeckType.Modern) 
             ? ECardDeckType.Original 
@@ -147,7 +147,7 @@ string? setDeckType()
     return null;
 }
 
-string? runOptionsMenu()
+string? RunOptionsMenu()
 {
     //constructing new optionsMenu with items
     var optionsGameMenu = new Menu(EMenuLevel.Second, "Options", new List<MenuItem>()
@@ -156,7 +156,7 @@ string? runOptionsMenu()
                 "No of card-packs used: "+ game.State.CardDeck.Size, 
                 (() => "No of card-packs used: "+game.State.CardDeck.Size.ToString()),//anonym. func
                 "p", 
-                setDeckSize
+                SetDeckSize
                 ),
             //TODO modernDeckType UNO after year 2018
             // new MenuItem(
@@ -178,7 +178,7 @@ string? runOptionsMenu()
     return optionsGameMenu.Run();;
 }
 //method for picking New Game
-string? runNewGameMenu()
+string? RunNewGameMenu()
 {
     //constructing new menu with items
     var startNewGameMenu = new Menu(EMenuLevel.Second, "New Game", new List<MenuItem>()
@@ -187,12 +187,12 @@ string? runNewGameMenu()
                 "Player count: "+game.State.Players.Count, 
                 (() => "Player count: "+game.State.Players.Count.ToString()),
                 "c", 
-                setPlayerCount),
+                SetPlayerCount),
             new MenuItem(
                 "Edit players: " + string.Join(", ", game.State.Players), 
                 (() => "Edit players: "+ string.Join(", ", game.State.Players)),
                 "t", 
-                editPlayerNamesAndTypes),
+                EditPlayerNamesAndTypes),
             new MenuItem(
                 "Start the game of UNO", 
                 null,
@@ -210,7 +210,7 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
         "Start a new game", 
         null,
         "s", 
-        runNewGameMenu),
+        RunNewGameMenu),
     new MenuItem(
         "Load game", 
         null,
@@ -220,7 +220,7 @@ var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
         "Options", 
         null,
         "o", 
-        runOptionsMenu),
+        RunOptionsMenu),
 });
 
 //method for loading saved games

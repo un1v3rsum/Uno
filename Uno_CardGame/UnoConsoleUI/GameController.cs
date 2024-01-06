@@ -141,7 +141,6 @@ public class GameController
                 if (_gameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
                 {
                     //get color input from player
-                    
                     var colorChoice = "";
                     var input = false;
                     do
@@ -246,10 +245,10 @@ public class GameController
                 if (_gameEngine
                         .State
                         .Players[_gameEngine.State.ActivePlayerNo]
-                        .PlayerType == EPlayerType.AI)
+                        .PlayerType == EPlayerType.Ai)
                 {
                     //choice is made by AI
-                    choice = _gameEngine.AIMove();
+                    choice = _gameEngine.AiChoice();
                 }
                 //<<<<<================ HUMAN PLAYER MAKES A CHOICE ===================>>>>>
                 else

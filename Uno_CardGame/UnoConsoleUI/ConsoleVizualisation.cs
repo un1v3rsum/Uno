@@ -6,25 +6,25 @@ using Domain;
 public static class ConsoleVizualisation
 {
     //method for loading new game text on console
-    public static void StartGame(GameState State)
+    public static void StartGame(GameState state)
     {
         //@start of the game clears the console from prev menusystem
         Console.Clear();
-        Console.WriteLine(State.TurnResult == ETurnResult.LoadGame
+        Console.WriteLine(state.TurnResult == ETurnResult.LoadGame
             //loading previous game
             ? "<======== LOADING PREVIOUS GAME ========>"
             //new game
             : "<============ NEW GAME ============>");
     }
     //method for loading new hand text on console
-    public static void StartHand(GameState State)
+    public static void StartHand(GameState state)
     {
-        if (State.TurnResult != ETurnResult.LoadGame)
+        if (state.TurnResult != ETurnResult.LoadGame)
         {
             //loading new hand
             Console.WriteLine("<======== STARTING NEW HAND =======>");
             Console.WriteLine("First card in discard-pile: " + 
-                              State.DiscardedCards.First());
+                              state.DiscardedCards.First());
         }
         else
         {

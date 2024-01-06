@@ -5,11 +5,11 @@ using Helpers;
 
 namespace DAL;
 
-public class GameRepositoryEF : IGameRepository
+public class GameRepositoryEf : IGameRepository
 {
     private readonly AppDbContext _context;
 
-    public GameRepositoryEF(AppDbContext context)
+    public GameRepositoryEf(AppDbContext context)
     {
         _context = context;
     }
