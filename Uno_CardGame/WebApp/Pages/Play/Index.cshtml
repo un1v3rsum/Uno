@@ -22,114 +22,111 @@
     </div>
     </div>
 
-@if (Model.GameEngine.GetActivePlayer().Id != Model.PlayerId)
+@if (!Model.GameEngine.GameDone)
 {
-    <h5>Reload page in <span id="reload-label">-</span></h5>
-    <div>Not your move! Wait!</div>
-}
-
-<h4>Active player: @Model.GameEngine.State.ActivePlayerNo - @Model.GameEngine.GetActivePlayer()</h4>
-
-@if (Model.GameEngine.GetActivePlayer().Id == Model.PlayerId)
-{
-    <div>You are active! Make your move!</div>
-    <body>
-    @if (Model.DrawCard)
+    @if (Model.GameEngine.GetActivePlayer().Id != Model.PlayerId)
     {
-        <form method="POST" id="drawCardForm">
-            <div>
-                <input type="hidden" asp-for=@Model.EndMove value="true"/>
-                <input type="hidden" asp-for=@Model.DrawCard value="false"/>
-                <button type="submit" class="btn btn-primary">End move</button>
-            </div>
-        </form>
+        <h5>Reload page in <span id="reload-label">-</span></h5>
+        <div>Not your move! Wait!</div>
     }
-    @if (Model.GameEngine.State.DiscardedCards.Last().CardColor 
-         != ECardColor.Wild && !Model.DrawCard)
+
+    <h4>Active player: @Model.GameEngine.State.ActivePlayerNo - @Model.GameEngine.GetActivePlayer()</h4>
+
+    @if (Model.GameEngine.GetActivePlayer().Id == Model.PlayerId)
     {
-        <form method="POST" id="drawCardForm">
-            <div>
-                <input type="hidden" asp-for=@Model.DrawCard value="true"/>
-                <button type="submit" class="btn btn-primary">Draw card</button>
-            </div>
-        </form>
-    }
-    <form method="POST" id="playCardForm">
-        @if (Model.GameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+        <div>You are active! Make your move!</div>
+        <body>
+        @if (Model.GameEngine.State.DiscardedCards.Last().CardColor != ECardColor.Wild
+             && Model.GameEngine.State.TurnResult != ETurnResult.DrewCard)
         {
-            <div>
-                <input type="hidden" asp-for="ColorSelection" value="true"/>
-                <button type="submit" id="chooseColor" class="btn btn-primary">Choose color</button>
-            </div>
-            <div class="uno-card">
-                <div class="Blue">
-                    <input type="radio" asp-for="SelectedCardColor" value="1"/>
+            <form method="POST" id="drawCardForm">
+                <div>
+                    <input type="hidden" asp-for=@Model.DrawCard value="true"/>
+                    <button type="submit" class="btn btn-primary">Draw card</button>
                 </div>
-            </div>
-            <div class="uno-card">
-                <div class="Red">
-                    <input type="radio" asp-for="SelectedCardColor" value="2"/>
-                </div>
-            </div>
-            <div class="uno-card">
-                <div class="Green">
-                    <input type="radio" asp-for="SelectedCardColor" value="3"/>
-                </div>
-            </div>
-            <div class="uno-card">
-                <div class="Yellow">
-                    <input type="radio" asp-for="SelectedCardColor" value="4"/>
-                </div>
-            </div>
+            </form>
         }
-        else
-        {
-            <div>
-                <input type="hidden" asp-for="CardPlayed" value="true"/>
-                <button type="submit" id="playButton" class="btn btn-primary" style="display:none;">Play card</button>
-            </div>
-            <div>
-                @foreach (var card in Model
-                              .GameEngine
-                              .State
-                              .Players[Model.GameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
-                {
-                    <div class="uno-card">
-                        <div class=@card.CardColor>
-                            <h5 class="left-side">@card.CardValueToString()
-                                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                <input type="radio"
-                                       asp-for=SelectedCardIndex
-                                       value=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)
-                                       disabled="@Model.GameEngine.CheckValidityHtml(Model.GameEngine.CheckValidity(Model.GameEngine.State.DiscardedCards.Last(), card))"
-                                       id=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)>
-                            </h5>
-                            <h5 class="right-side">@card.CardValueToString()</h5>
-                            <div class="center">
-                                <h1>@card.CardValueToString()</h1>
+        <form method="POST" id="playCardForm">
+            @if (Model.GameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+            {
+                <div>
+                    <input type="hidden" asp-for="ColorSelection" value="true"/>
+                    <button type="submit" id="chooseColor" class="btn btn-primary">Choose color</button>
+                </div>
+                <div class="uno-card">
+                    <div class="Blue">
+                        <input type="radio" asp-for="SelectedCardColor" value="1"/>
+                    </div>
+                </div>
+                <div class="uno-card">
+                    <div class="Red">
+                        <input type="radio" asp-for="SelectedCardColor" value="2"/>
+                    </div>
+                </div>
+                <div class="uno-card">
+                    <div class="Green">
+                        <input type="radio" asp-for="SelectedCardColor" value="3"/>
+                    </div>
+                </div>
+                <div class="uno-card">
+                    <div class="Yellow">
+                        <input type="radio" asp-for="SelectedCardColor" value="4"/>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <input type="hidden" asp-for="CardPlayed" value="true"/>
+                    <button type="submit" id="playButton" class="btn btn-primary" style="display:none;">Play card</button>
+                </div>
+                <div>
+                    @foreach (var card in Model
+                                  .GameEngine
+                                  .State
+                                  .Players[Model.GameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
+                    {
+                        <div class="uno-card">
+                            <div class=@card.CardColor>
+                                <h5 class="left-side">@card.CardValueToString()
+                                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                    <input type="radio"
+                                           asp-for=SelectedCardIndex
+                                           value=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)
+                                           disabled="@Model.GameEngine.CheckValidityHtml(Model.GameEngine.CheckValidity(Model.GameEngine.State.DiscardedCards.Last(), card))"
+                                           id=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)>
+                                </h5>
+                                <h5 class="right-side">@card.CardValueToString()</h5>
+                                <div class="center">
+                                    <h1>@card.CardValueToString()</h1>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
-        }
-    </form>
-    </body>
+                    }
+                </div>
+            }
+        </form>
+        </body>
+    }
+}
+else
+{
+    <title>Game @Model.GameId is finished! Winner: @Model.GameEngine.GetActivePlayer().NickName </title>
 }
 
     @section Scripts
     {
             <!--script for reloading the page every 5 sec-->
-        <script>
-        let timerValue = 3;
-        let timerLabel = document.querySelector("#reload-label");
-        setInterval(() => {
-            timerValue--;
-            timerLabel.innerHTML = timerValue.toString();
-            if (timerValue<=0){
-                window.location.reload();
-            };
-        }, 1000);
+            <script>
+            let timerValue = 3;
+            let timerLabel = document.querySelector("#reload-label");
+            setInterval(() => {
+                timerValue--;
+                timerLabel.innerHTML = timerValue.toString();
+                if (timerValue<=0){
+                    window.location.reload();
+                };
+            }, 1000);
         </script>
         <!--script for enabling play card button-->
         <script>

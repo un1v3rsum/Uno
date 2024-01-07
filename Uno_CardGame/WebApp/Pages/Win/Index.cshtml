@@ -1,0 +1,20 @@
+@page
+@model WebApp.Pages.Win.Index
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true"/>
+    <title>Game @Model.GameId is finished! Winner: @Model.GameEngine.GetActivePlayer().NickName </title>
+</head>
+<body>
+<div>
+    
+</div>
+</body>
+</html>

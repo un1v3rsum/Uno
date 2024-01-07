@@ -40,7 +40,7 @@ using var db = new AppDbContext(contextOptions);
 //create database and do the migrations if database doesnt already exist
 //db.Database.Migrate();
 //create gamerepository in db
-var gameRepository = new GameRepositoryEf(db);
+var gameRepository = new GameRepositoryEF(db);
 //<<<====================== DATABASE SAVE OPTIONS ====================>>>
 
 //create gameEngine

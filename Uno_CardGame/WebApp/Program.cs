@@ -7,6 +7,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 connectionString = connectionString.Replace("<%temppath%>", Path.GetTempPath());
+Console.WriteLine(connectionString);
 
 //dependence injection
 //makes all the connections, i dont have to think about creating/opening/closing databases

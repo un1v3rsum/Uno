@@ -149,29 +149,14 @@ public class GameEngine
 
     public void AiMove()
     {
-        MakeAMove(AiChoice());
+        var choice = AiChoice();
+        Console.WriteLine("do we get aiChoice: " + choice);
+        MakeAMove(choice);
+        
         if (State.TurnResult == ETurnResult.DrewCard)
         {
             DrewCard(1);
             //check if they are able to play the card
-
-            if (CheckValidity(State.DiscardedCards.Last(), 
-                    State.Players[State.ActivePlayerNo].PlayerHand.Last()))
-            {
-                //actually play the card
-                PlayCard(
-                        State
-                        .Players[State.ActivePlayerNo]
-                        .PlayerHand.Count - 1);
-                //If the played card was not a wild card then move on to next player
-                //if it was a wild card, then we want the active player to declare new color
-                if (State.DiscardedCards.Last().CardColor == ECardColor.Wild)
-                {
-                    var random = new Random();
-                    var colorChoice = random.Next(1, 5).ToString();
-                    DeclareColor(colorChoice);
-                }
-            }
         }
     }
     //method for making a valid move
@@ -248,6 +233,7 @@ public class GameEngine
     //method for valid move check
     public bool CheckValidity(GameCard discarded, GameCard choice)
     {
+        Console.WriteLine("turnresult: " + State.TurnResult);
         Console.WriteLine("do we control validity?");
         Console.WriteLine("who checks validity: " + State.Players[State.ActivePlayerNo].NickName);
         Console.WriteLine("discarded card was: " + discarded.ToString2());
@@ -313,6 +299,7 @@ public class GameEngine
     public bool IsHandFinished()
     {
         Console.WriteLine("do we control handFinish?");
+        Console.WriteLine("how many cards on hand: " + State.Players[State.ActivePlayerNo].PlayerHand.Count);
         if (State.Players[State.ActivePlayerNo].PlayerHand.Count == 0)
         {
             Console.WriteLine(State
@@ -381,8 +368,31 @@ public class GameEngine
             .Players[State.ActivePlayerNo]
             .PlayerHand
             .AddRange(State.CardDeck.Draw(noOfCards));
-        //modify turnResult
-        State.TurnResult = ETurnResult.DrewCard;
+
+        //check if they are able to play the card
+        if (CheckValidity(
+                    State
+                    .DiscardedCards
+                    .Last(), 
+                    State
+                    .Players[State.ActivePlayerNo]
+                    .PlayerHand.Last()))
+        {
+            //actually play the card
+            PlayCard(State.Players[State.ActivePlayerNo].PlayerHand.Count - 1);
+            
+            //If the played card was not a wild card then move on to next player
+            //if it was a wild card, then we want the active player to declare new color
+            if (State.DiscardedCards.Last().CardColor != ECardColor.Wild)
+            {
+                NextPlayer();
+            }
+        }
+        //if player drew a card and couldnt play it, then game moves on to next player
+        else
+        {
+            NextPlayer();
+        }
     }
     
     //method for getting the active player

@@ -45,38 +45,9 @@ public class GameController
                 //<<<<<================ IF PLAYER DREW A CARD ===================>>>>>
                 if (_gameEngine.State.TurnResult == ETurnResult.DrewCard)
                 {
-                    //draws one card
+                    //draws one card, checks its validity and plays if allowed
                     _gameEngine.DrewCard(1);
-                    //check if they are able to play the card
-                    if (_gameEngine.CheckValidity(
-                            _gameEngine
-                                .State
-                                .DiscardedCards
-                                .Last(), 
-                            _gameEngine
-                                .State
-                                .Players[_gameEngine.State.ActivePlayerNo]
-                                .PlayerHand.Last()))
-                    {
-                        //actually play the card
-                        _gameEngine.PlayCard(
-                            _gameEngine
-                                .State
-                                .Players[_gameEngine.State.ActivePlayerNo]
-                                .PlayerHand.Count - 1);
-                        
-                        //If the played card was not a wild card then move on to next player
-                        //if it was a wild card, then we want the active player to declare new color
-                        if (_gameEngine.State.DiscardedCards.Last().CardColor != ECardColor.Wild)
-                        {
-                            _gameEngine.NextPlayer();
-                        }
-                    }
-                    //if player drew a card and couldnt play it, then game moves on to next player
-                    else
-                    {
-                        _gameEngine.NextPlayer();
-                    }
+
                 }
                 //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
                 

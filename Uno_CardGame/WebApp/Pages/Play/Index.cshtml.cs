@@ -16,12 +16,13 @@ public class Index : PageModel
     public Index(AppDbContext context)
     {
         _context = context;
-        _gameRepository = new GameRepositoryEf(_context);
+        _gameRepository = new GameRepositoryEF(_context);
+        
     }
     //attribute to get the Id values
     [BindProperty(SupportsGet = true)]public Guid GameId { get; set; }
     [BindProperty(SupportsGet = true)]public Guid PlayerId { get; set; }
-    [BindProperty] public int SelectedCardIndex { get; set; }
+    [BindProperty] public int SelectedCardIndex { get; set; } = default!;
     [BindProperty]public string SelectedCardColor { get; set; } 
     [BindProperty]public bool ColorSelection { get; set; } 
     [BindProperty]public bool CardPlayed { get; set; } 
@@ -37,39 +38,55 @@ public class Index : PageModel
             State = gameState
         };
         
+        Console.WriteLine("turnresult: " + GameEngine.State.TurnResult);
+        
         DrawCard = false;
         ColorSelection = false;
         CardPlayed = false;
         Uno = false;
         EndMove = false;
-
-        if (GameEngine.GetActivePlayer().PlayerType == EPlayerType.Ai)
+        
+        if (GameEngine.GetActivePlayer().PlayerType == EPlayerType.Ai && !GameEngine.GameDone)
         {
+            Console.WriteLine("do we get to AIMove?");
             GameEngine.AiMove();
-
+            if (GameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+            {
+                var random = new Random();
+                var colorChoice = random.Next(1, 5).ToString();
+                GameEngine.DeclareColor(colorChoice);
+            }
+        
             if (!GameEngine.IsHandFinished())
             {
                 GameEngine.NextPlayer();
             }
+            else
+            {
+                if (!GameEngine.IsGameOver())
+                {
+                    Console.WriteLine("do we update game?");
+                    GameEngine.UpdateGame();
+                }
+                else
+                {
+                    GameEngine.GameDone = true;
+                }
+            }
         }
+        GameEngine.State.TurnResult = ETurnResult.OnGoing;
         _gameRepository.SaveGame(GameEngine.State.Id, GameEngine.State);
-        
-        if (!GameEngine.IsGameOver())
-        {
-            GameEngine.UpdateGame();
-        }
-
     }
 
-    public void OnPost()
+    public IActionResult OnPost()
     {
         var gameState = _gameRepository.LoadGame(GameId);
-        
         GameEngine = new GameEngine(_gameRepository)
         {
             State = gameState
         };
-                
+        Console.WriteLine("turnresult: " + GameEngine.State.TurnResult);
+
         if (DrawCard)
         {
             GameEngine.DrewCard(1);
@@ -77,33 +94,38 @@ public class Index : PageModel
         
         if (CardPlayed)
         {
+            Console.WriteLine("OnPost() CardPlayed who is here: " + GameEngine.GetActivePlayer().NickName);
             GameEngine.PlayCard(SelectedCardIndex);
-            if (DrawCard)
-            {
-                DrawCard = false;
-            }
-            CardPlayed = false;
-            
+        
             if (GameEngine.State.DiscardedCards.Last().CardColor != ECardColor.Wild)
             {
                 GameEngine.NextPlayer();
             }
+            Console.WriteLine("what is CardPlayed value: " + CardPlayed);
         }
-        
+    
         if (ColorSelection)
         {
             GameEngine.DeclareColor(SelectedCardColor);
-            ColorSelection = false;
             GameEngine.NextPlayer();
+            Console.WriteLine("what is colorselection boolean value: " + ColorSelection);
         }
         
-        if (EndMove)
+        
+        if (GameEngine.IsHandFinished())
         {
-            EndMove = false;
-            GameEngine.NextPlayer();
+            if (!GameEngine.IsGameOver())
+            {
+                Console.WriteLine("do we update game?");
+                GameEngine.UpdateGame();
+            }
+            else
+            {
+                GameEngine.GameDone = true;
+            }
         }
-        
-        _gameRepository.SaveGame(GameEngine.State.Id, GameEngine.State);
 
+        _gameRepository.SaveGame(GameEngine.State.Id, GameEngine.State);
+        return Redirect("/Play?GameId=" + GameEngine.State.Id + "&PlayerId=" + PlayerId);
     }
 }

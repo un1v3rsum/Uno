@@ -5,11 +5,11 @@ using Helpers;
 
 namespace DAL;
 
-public class GameRepositoryEf : IGameRepository
+public class GameRepositoryEF : IGameRepository
 {
     private readonly AppDbContext _context;
 
-    public GameRepositoryEf(AppDbContext context)
+    public GameRepositoryEF(AppDbContext context)
     {
         _context = context;
     }
@@ -57,6 +57,12 @@ public class GameRepositoryEf : IGameRepository
     public GameState LoadGame(Guid id)
     {
         var game = _context.Games.First(g => g.Id == id);
-        return JsonSerializer.Deserialize<GameState>(game.State, JsonHelpers.JsonSerializerOptions);
+        if (game != null)
+        {
+            Console.WriteLine($"Game found with id: {game.Id}");
+            return JsonSerializer.Deserialize<GameState>(game.State, JsonHelpers.JsonSerializerOptions);
+        }
+        Console.WriteLine($"No game found with id: {id}");
+        return null;
     }
 }
