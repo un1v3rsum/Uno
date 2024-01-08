@@ -45,7 +45,82 @@ public class Index : PageModel
         CardPlayed = false;
         Uno = false;
         EndMove = false;
+
+        if (!GameEngine.IsHandFinished())
+        {
+                    //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
+                
+        //<<<<<================ SKIP ===================>>>>>
+        if (GameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)
+        {
+            //if previous player made the move and didn't draw a card, then next player is skipped
+            // & it's not a loadgame
+            if (GameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                GameEngine.State.TurnResult != ETurnResult.LoadGame)
+            {
+                //move on to next player
+                GameEngine.NextPlayer();
+            }
+        }
+                //<<<<<================ REVERSE ===================>>>>>
+        if (GameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Reverse)
+        {
+            //if previous player made the move and didn't draw a card and next player in line is changed
+            if (GameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                GameEngine.State.TurnResult != ETurnResult.LoadGame)
+            {
+                //then gameDirection is reversed
+                GameEngine.SetGameDirection();
+                //and next player is picked
+                //since PlayerMove() already went over to next player before gamedirection was set, 
+                //then we go back to the player before Reverse card player
+                GameEngine.NextPlayer();
+                GameEngine.NextPlayer();
+            }
+        }
+        //<<<<<================ DRAW-TWO ===================>>>>>
+        if (GameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawTwo)
+        {
+            //if previous player made the move and didn't draw a card
+            if (GameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                GameEngine.State.TurnResult != ETurnResult.LoadGame)
+            {
+                GameEngine.DrewCard(2);
+            }
+        }
         
+                //<<<<<================ WILD + DRAW FOUR ===================>>>>>
+        if (GameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour)
+        {
+            //if it is the first draw of the game
+            if (GameEngine.State.TurnResult == ETurnResult.GameStart)
+            {
+                //first card in discardpile is put back into the deck 
+                GameEngine
+                    .State
+                    .CardDeck
+                    .Cards.Add(
+                        GameEngine
+                            .State
+                            .DiscardedCards.First());
+                
+                //remove the card from discardpile
+                GameEngine
+                    .State
+                    .DiscardedCards.RemoveAt(0);
+                
+                //initialize new discard pile
+                GameEngine.InitializeDiscardPile();
+            }
+            //if it is not a draw card or the beginning of the loadGame
+            if (GameEngine.State.TurnResult != ETurnResult.DrewCard && 
+                GameEngine.State.TurnResult != ETurnResult.LoadGame)
+            {
+                //and draws 4 cards
+                GameEngine.DrewCard(4);
+            }
+        }
+        //<<<<<================ AI MOVE ===================>>>>>
         if (GameEngine.GetActivePlayer().PlayerType == EPlayerType.Ai && !GameEngine.GameDone)
         {
             Console.WriteLine("do we get to AIMove?");
@@ -56,25 +131,35 @@ public class Index : PageModel
                 var colorChoice = random.Next(1, 5).ToString();
                 GameEngine.DeclareColor(colorChoice);
             }
-        
-            if (!GameEngine.IsHandFinished())
+
+            if (GameEngine.IsHandFinished())
             {
-                GameEngine.NextPlayer();
-            }
-            else
-            {
-                if (!GameEngine.IsGameOver())
+                if (GameEngine.IsGameOver())
+                {
+                    GameEngine.GameDone = true;
+                }
+                else
                 {
                     Console.WriteLine("do we update game?");
                     GameEngine.UpdateGame();
                 }
-                else
-                {
-                    GameEngine.GameDone = true;
-                }
             }
         }
         GameEngine.State.TurnResult = ETurnResult.OnGoing;
+        }
+        else
+        {
+            if (!GameEngine.IsGameOver())
+            {
+                Console.WriteLine("do we update game?");
+                GameEngine.UpdateGame();
+            }
+            else
+            {
+                GameEngine.GameDone = true;
+            }
+        }
+        
         _gameRepository.SaveGame(GameEngine.State.Id, GameEngine.State);
     }
 
@@ -96,11 +181,6 @@ public class Index : PageModel
         {
             Console.WriteLine("OnPost() CardPlayed who is here: " + GameEngine.GetActivePlayer().NickName);
             GameEngine.PlayCard(SelectedCardIndex);
-        
-            if (GameEngine.State.DiscardedCards.Last().CardColor != ECardColor.Wild)
-            {
-                GameEngine.NextPlayer();
-            }
             Console.WriteLine("what is CardPlayed value: " + CardPlayed);
         }
     
@@ -109,20 +189,6 @@ public class Index : PageModel
             GameEngine.DeclareColor(SelectedCardColor);
             GameEngine.NextPlayer();
             Console.WriteLine("what is colorselection boolean value: " + ColorSelection);
-        }
-        
-        
-        if (GameEngine.IsHandFinished())
-        {
-            if (!GameEngine.IsGameOver())
-            {
-                Console.WriteLine("do we update game?");
-                GameEngine.UpdateGame();
-            }
-            else
-            {
-                GameEngine.GameDone = true;
-            }
         }
 
         _gameRepository.SaveGame(GameEngine.State.Id, GameEngine.State);

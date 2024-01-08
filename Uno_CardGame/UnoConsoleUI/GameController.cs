@@ -47,7 +47,6 @@ public class GameController
                 {
                     //draws one card, checks its validity and plays if allowed
                     _gameEngine.DrewCard(1);
-
                 }
                 //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
                 
@@ -104,8 +103,6 @@ public class GameController
                                 .NickName} " + $"misses his turn! ");
                         
                         _gameEngine.DrewCard(2);
-                        //move on to next player
-                        _gameEngine.NextPlayer();
                     }
                 }
                 //<<<<<================ WILD ===================>>>>>
@@ -187,8 +184,6 @@ public class GameController
                                 .NickName} " + $"misses his turn! ");
                         //and draws 4 cards
                         _gameEngine.DrewCard(4);
-                        //game moves on to the next player
-                        _gameEngine.NextPlayer();
                     }
                 }
                 //<<<<<================ IF PREVIOUS CARDS WERE NUMBER CARDS ===============================>>>>>
@@ -269,34 +264,19 @@ public class GameController
                 //<<<<<================ PLAYER MAKES AN ACTUAL MOVE ===================>>>>>
                 _gameEngine.MakeAMove(choice);
                 
-                //<<<<<================ DO WE MOVE ON TO THE NEXT PLAYER? ===================>>>>>
-                
-                //check if player hand is empty
-                if (!_gameEngine.IsHandFinished())
-                {
-                    //if player didn't draw a card or they didn't play a wild card
-                    if (_gameEngine
-                            .State
-                            .DiscardedCards
-                            .Last()
-                            .CardColor != ECardColor.Wild)
-                    {
-                        if (choice != "d")
-                        {
-                            //then game goes on to the next player
-                            _gameEngine.NextPlayer();
-                        }
-                    }
-                }
-                //if player hand was empty, then check if the game is over
-                else
-                {
-                    _gameEngine.HandDone = true;
-                    _gameEngine.GameDone = _gameEngine.IsGameOver();
-                }
-                
+                                
                 //<<<<<================ SAVE GAME AFTER EVERY MOVE ===================>>>>>
                 _gameRepository.SaveGame(_gameEngine.State.Id, _gameEngine.State);
+                
+                //<<<<<================ DO WE MOVE ON TO THE NEXT PLAYER? ===================>>>>>
+                
+                // if player hand is empty
+                if (_gameEngine.IsHandFinished())
+                {
+                    //if player hand was empty, then check if the game is over
+                    _gameEngine.GameDone = _gameEngine.IsGameOver();
+                }
+
             }
         }
         return null;

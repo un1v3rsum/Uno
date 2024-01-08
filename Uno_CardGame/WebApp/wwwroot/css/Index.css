@@ -1,5 +1,97 @@
 :root {
     --primary-color: #07afd9;
+} 
+
+.button-44 {
+    float: left;
+   background: #e62143;
+   border-radius: 11px;
+   box-sizing: border-box;
+   color: #fff;
+   cursor: pointer;
+   display: flex;
+   font-family: Mija,-apple-system,BlinkMacSystemFont,Roboto,"Roboto Slab","Droid Serif","Segoe UI",system-ui,Arial,sans-serif;
+   font-size: 1.15em;
+   font-weight: 700;
+   justify-content: center;
+   line-height: 33.4929px;
+   padding: .8em 1em;
+   text-align: center;
+   text-decoration: none;
+   text-decoration-skip-ink: auto;
+   text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+   text-underline-offset: 1px;
+   transition: all .2s ease-in-out;
+   user-select: none;
+   -webkit-user-select: none;
+   touch-action: manipulation;
+   width: 20%;
+   word-break: break-word;
+   border: 0;
+    margin: 10px;
+}
+
+.button-45 {
+    float: left;
+    background: #198754;
+    border-radius: 11px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-family: Mija,-apple-system,BlinkMacSystemFont,Roboto,"Roboto Slab","Droid Serif","Segoe UI",system-ui,Arial,sans-serif;
+    font-size: 1.15em;
+    font-weight: 700;
+    justify-content: center;
+    line-height: 33.4929px;
+    padding: .8em 1em;
+    text-align: center;
+    text-decoration: none;
+    text-decoration-skip-ink: auto;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    text-underline-offset: 1px;
+    transition: all .2s ease-in-out;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: 20%;
+    word-break: break-word;
+    border: 0;
+    margin: 10px;
+}
+
+.button-44:active,
+.button-44:focus {
+    border-bottom-style: none;
+    border-color: #dadada;
+    box-shadow: rgba(0, 0, 0, .3) 0 3px 3px inset;
+    outline: 0;
+}
+
+.button-44:hover {
+    border-bottom-style: none;
+    border-color: #dadada;
+}
+
+.float-left {
+    float: left;
+    width: 0%; /* Adjust the width as needed */
+}
+
+.float-right {
+    float: right;
+    width: 90%; /* Adjust the width as needed */
+}
+.float-right-text {
+    float: right;
+    width: 70%; /* Adjust the width as needed */
+}
+
+/* Clearfix to prevent collapsing parent's height */
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 body{
@@ -18,6 +110,7 @@ body{
     height: 330px;
     background-color: white;
     border-radius: 10px;
+    margin: 10px;
 }
 
 .Wild{
@@ -81,6 +174,8 @@ body{
     transform: rotate(36deg);
 }
 
+h3 { font-size: 35px; letter-spacing: -1px; color: #084298; text-transform: uppercase; margin: 20px 0 24px; text-align: center; line-height: 50px; }
+h4 { color: #ffffff; font-family: 'Raleway',sans-serif; font-size: 30px; font-weight: 800; line-height: 36px; margin: 20px; text-align: center; }
 h1{
     color: white;
     font-size: 4rem;
@@ -90,8 +185,9 @@ h1{
 }
 
 h11{
+    float: right;
     color: white;
-    font-size: 4rem;
+    font-size: 3rem;
     -webkit-text-stroke: 2px black;
     text-shadow: 5px 2px black;
 }

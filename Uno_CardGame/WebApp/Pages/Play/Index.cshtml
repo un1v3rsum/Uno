@@ -2,116 +2,144 @@
 @using Domain
 @using DAL
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.EntityFrameworkCore
 @using UnoEngine
 @model WebApp.Pages.Play.Index
 
 <head>
     <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true"/>
 </head>
-<div>
-    <h11>Game Over: @Model.GameEngine.GameDone</h11>
+<h3 class="float-right-text">Game ID: @Model.GameId</h3>
+<!--Show last played card -->
+<div class="float-left">
+    <p><a target="_blank" rel="external nofollow"> <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/fed3bb24-454f-4bdf-a721-6aa8f23e7cef/d9gnihf-ec16caeb-ec9c-4870-9480-57c7711d844f.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2ZlZDNiYjI0LTQ1NGYtNGJkZi1hNzIxLTZhYThmMjNlN2NlZlwvZDlnbmloZi1lYzE2Y2FlYi1lYzljLTQ4NzAtOTQ4MC01N2M3NzExZDg0NGYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.kp5EommPFQl1sDPPtC-p8JloXDTm3CyNUgoievwh8Kw" alt="baby" width="210" height="330" float="right"/><br /> </a></p>
 </div>
-<h11>Discard pile:</h11>
-<div class="uno-card">
-    <div class=@Model.GameEngine.State.DiscardedCards.Last().CardColor>
-        <h5 class="left-side">@Model.GameEngine.State.DiscardedCards.Last().CardValueToString()</h5>
-        <h5 class="right-side">@Model.GameEngine.State.DiscardedCards.Last().CardValueToString()</h5>
-        <div class="center">
-            <h1>@Model.GameEngine.State.DiscardedCards.Last().CardValueToString()</h1>
+<div class="float-right">
+    <div class="uno-card">
+        <div class=@Model.GameEngine.State.DiscardedCards.Last().CardColor>
+            <h5 class="left-side">@Model.GameEngine.State.DiscardedCards.Last().CardValueToString()</h5>
+            <h5 class="right-side">@Model.GameEngine.State.DiscardedCards.Last().CardValueToString()</h5>
+            <div class="center">
+                <h1>@Model.GameEngine.State.DiscardedCards.Last().CardValueToString()</h1>
+            </div>
         </div>
     </div>
-    </div>
-
-@if (!Model.GameEngine.GameDone)
-{
-    @if (Model.GameEngine.GetActivePlayer().Id != Model.PlayerId)
+    @if (!Model.GameEngine.GameDone)
     {
-        <h5>Reload page in <span id="reload-label">-</span></h5>
-        <div>Not your move! Wait!</div>
+    
+        <div class="float-right-text">
+            <!--Show who is active player -->
+            <h4 text-align="center">Active player: @Model.GameEngine.GetActivePlayer().NickName</h4>
+            <!--Page reloader if player is not the active player -->
+            @if (Model.GameEngine.GetActivePlayer().Id != Model.PlayerId)
+            {
+                <h4>Not your move! Wait!</h4>
+                <h4>Reload page in <span id="reload-label">-</span></h4>
+            }
+            else
+            {
+                <!--Page reloader if player is AI -->
+                @if (Model.GameEngine.GetActivePlayer().PlayerType == EPlayerType.Ai)
+                {
+                    <h4>The player is AI!</h4>
+                    <h4>Reload page in <span id="reload-label">-</span></h4>
+                }
+            }
+        </div>
     }
-
-    <h4>Active player: @Model.GameEngine.State.ActivePlayerNo - @Model.GameEngine.GetActivePlayer()</h4>
-
-    @if (Model.GameEngine.GetActivePlayer().Id == Model.PlayerId)
+    else
     {
-        <div>You are active! Make your move!</div>
-        <body>
+        <div class="float-right-text">
+            <!--check if game is over: YES -->
+                <h4>Game Over! Winner is @Model.GameEngine.GetActivePlayer().NickName</h4>
+        </div>
+    }
+</div>
+<div class="clearfix"></div>
+<!--check if game is over: NOT -->
+@if (!Model.GameEngine.GameDone)
+{ 
+    <!--If player is human and the active player -->
+    @if (Model.GameEngine.GetActivePlayer().Id == Model.PlayerId && 
+         Model.GameEngine.GetActivePlayer().PlayerType != EPlayerType.Ai)
+    {
+        <body><!--Render draw button -->
         @if (Model.GameEngine.State.DiscardedCards.Last().CardColor != ECardColor.Wild
              && Model.GameEngine.State.TurnResult != ETurnResult.DrewCard)
         {
             <form method="POST" id="drawCardForm">
                 <div>
                     <input type="hidden" asp-for=@Model.DrawCard value="true"/>
-                    <button type="submit" class="btn btn-primary">Draw card</button>
+                    <button type="submit" class="button-44">Draw card</button>
                 </div>
             </form>
         }
-        <form method="POST" id="playCardForm">
-            @if (Model.GameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
-            {
-                <div>
-                    <input type="hidden" asp-for="ColorSelection" value="true"/>
-                    <button type="submit" id="chooseColor" class="btn btn-primary">Choose color</button>
-                </div>
-                <div class="uno-card">
-                    <div class="Blue">
-                        <input type="radio" asp-for="SelectedCardColor" value="1"/>
+        <div><!--Render color selection cards if player selected WILD card -->
+            <form method="POST" id="playCardForm">
+                @if (Model.GameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
+                {
+                    <div>
+                        <input type="hidden" asp-for="ColorSelection" value="true"/>
+                        <button class="button-45" type="submit" id="chooseColor" class="btn btn-primary">Choose color</button>
                     </div>
-                </div>
-                <div class="uno-card">
-                    <div class="Red">
-                        <input type="radio" asp-for="SelectedCardColor" value="2"/>
+                    <div class="clearfix"></div>
+                    <div class="uno-card">
+                        <div class="Blue">
+                            <input type="radio" asp-for="SelectedCardColor" value="1"/>
+                        </div>
                     </div>
-                </div>
-                <div class="uno-card">
-                    <div class="Green">
-                        <input type="radio" asp-for="SelectedCardColor" value="3"/>
+                    <div class="uno-card">
+                        <div class="Red">
+                            <input type="radio" asp-for="SelectedCardColor" value="2"/>
+                        </div>
                     </div>
-                </div>
-                <div class="uno-card">
-                    <div class="Yellow">
-                        <input type="radio" asp-for="SelectedCardColor" value="4"/>
+                    <div class="uno-card">
+                        <div class="Green">
+                            <input type="radio" asp-for="SelectedCardColor" value="3"/>
+                        </div>
                     </div>
-                </div>
-            }
-            else
-            {
-                <div>
-                    <input type="hidden" asp-for="CardPlayed" value="true"/>
-                    <button type="submit" id="playButton" class="btn btn-primary" style="display:none;">Play card</button>
-                </div>
-                <div>
-                    @foreach (var card in Model
-                                  .GameEngine
-                                  .State
-                                  .Players[Model.GameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
-                    {
-                        <div class="uno-card">
-                            <div class=@card.CardColor>
-                                <h5 class="left-side">@card.CardValueToString()
-                                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                    <input type="radio"
-                                           asp-for=SelectedCardIndex
-                                           value=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)
-                                           disabled="@Model.GameEngine.CheckValidityHtml(Model.GameEngine.CheckValidity(Model.GameEngine.State.DiscardedCards.Last(), card))"
-                                           id=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)>
-                                </h5>
-                                <h5 class="right-side">@card.CardValueToString()</h5>
-                                <div class="center">
-                                    <h1>@card.CardValueToString()</h1>
+                    <div class="uno-card">
+                        <div class="Yellow">
+                            <input type="radio" asp-for="SelectedCardColor" value="4"/>
+                        </div>
+                    </div>
+                }
+                else
+                {<!--Render play card button -->
+                    <div>
+                        <input type="hidden" asp-for="CardPlayed" value="true"/>
+                        <button class="button-45" type="submit" id="playButton" class="btn btn-primary" style="display:none;">Play card</button>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div>   <!--Render players cards on hand, disabled if not a VALID move -->
+                        @foreach (var card in Model
+                                      .GameEngine
+                                      .State
+                                      .Players[Model.GameEngine.GetPlayerIndex(Model.PlayerId)].PlayerHand)
+                        {
+                            <div class="uno-card">
+                                <div class=@card.CardColor>
+                                    <h5 class="left-side">@card.CardValueToString()
+                                        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                        <input type="radio"
+                                               asp-for=SelectedCardIndex
+                                               value=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)
+                                               disabled="@Model.GameEngine.CheckValidityHtml(Model.GameEngine.CheckValidity(Model.GameEngine.State.DiscardedCards.Last(), card))"
+                                               id=@Model.GameEngine.GetCardPositionInPlayerHand(@card, Model.PlayerId)>
+                                    </h5>
+                                    <h5 class="right-side">@card.CardValueToString()</h5>
+                                    <div class="center">
+                                        <h1>@card.CardValueToString()</h1>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    }
-                </div>
-            }
-        </form>
+                        }
+                    </div>
+                }
+            </form>
+        </div>
         </body>
     }
-}
-else
-{
-    <title>Game @Model.GameId is finished! Winner: @Model.GameEngine.GetActivePlayer().NickName </title>
 }
 
     @section Scripts
