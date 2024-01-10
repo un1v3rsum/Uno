@@ -184,6 +184,12 @@ h1{
     transform: rotate(-35deg);
 }
 
+nav {
+    background-color: #3498db; /* Change this to the desired background color */
+    padding: 10px; /* Adjust padding as needed */
+    text-align: center;
+}
+
 h11{
     float: right;
     color: white;

@@ -1,32 +1,31 @@
 @page
+@using Domain.Database
+@using Microsoft.EntityFrameworkCore
 @model WebApp.Pages_Players.IndexModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>List of players</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Player[0].NickName)
+                @Html.DisplayNameFor(model => model.Players[0].NickName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Player[0].PlayerType)
+                @Html.DisplayNameFor(model => model.Players[0].PlayerType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Player[0].Game)
+                @Html.DisplayNameFor(model => model.Players[0].Game)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Player) {
+@foreach (var item in Model.Players) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.NickName)
@@ -35,12 +34,20 @@
                 @Html.DisplayFor(modelItem => item.PlayerType)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Game.State)
+                @foreach (var game in Model.Games)
+                {
+                    if (game.Players.Contains(item))
+                    {
+                        var gameLabel = game.Id;
+                        <a asp-page="/Games/Index" asp-route-GameId="@game.Id" asp-route-PlayerId="@item.Id">@gameLabel</a>
+                    }
+                }
             </td>
             <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                @*<a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a> |*@
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+                
             </td>
         </tr>
 }

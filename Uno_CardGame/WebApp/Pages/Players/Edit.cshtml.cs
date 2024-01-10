@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DAL;
 using Domain.Database;
+using UnoEngine;
+using Player = Domain.Database.Player;
 
 namespace WebApp.Pages_Players
 {
@@ -18,11 +20,12 @@ namespace WebApp.Pages_Players
         public EditModel(DAL.AppDbContext context)
         {
             _context = context;
+           
         }
-
-        [BindProperty]
-        public Player Player { get; set; } = default!;
-
+        [BindProperty]public Player Player { get; set; } = default!;
+        [BindProperty]public IList<Game> Games { get;set; } = default!;
+        [BindProperty]public IList<Player> Players { get;set; } = default!;
+        
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
             if (id == null || _context.Players == null)
@@ -31,12 +34,29 @@ namespace WebApp.Pages_Players
             }
 
             var player =  await _context.Players.FirstOrDefaultAsync(m => m.Id == id);
+            
             if (player == null)
             {
                 return NotFound();
             }
+            
+            if (_context.Games != null)
+            {
+                Games = await _context.Games
+                    .Include(g => g.Players)
+                    .OrderByDescending(g => g.UpdatedAtDt)
+                    .ToListAsync();
+            }
+            
+            if (_context.Players != null)
+            {
+                Players = await _context.Players
+                    .Include(p => p.Game).ToListAsync();
+            }
+            
             Player = player;
-           ViewData["GameId"] = new SelectList(_context.Games, "Id", "State");
+            ViewData["GameId"] = new SelectList(_context.Games, "Id", "State");
+
             return Page();
         }
 
@@ -48,9 +68,8 @@ namespace WebApp.Pages_Players
             {
                 return Page();
             }
-
             _context.Attach(Player).State = EntityState.Modified;
-
+            
             try
             {
                 await _context.SaveChangesAsync();
@@ -66,7 +85,7 @@ namespace WebApp.Pages_Players
                     throw;
                 }
             }
-
+            
             return RedirectToPage("./Index");
         }
 

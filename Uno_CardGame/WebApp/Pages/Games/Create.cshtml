@@ -5,31 +5,34 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>New Game</h1>
 
-<h4>Game</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Game.CreatedAtDt" class="control-label"></label>
-                <input asp-for="Game.CreatedAtDt" class="form-control" />
-                <span asp-validation-for="Game.CreatedAtDt" class="text-danger"></span>
+                <label asp-for="@Model.Number1">How many HUMAN players:</label>
+                <input asp-for="@Model.Number1" type="number" min="1" max="5" required>
+                <span asp-validation-for="@Model.Number1"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Game.UpdatedAtDt" class="control-label"></label>
-                <input asp-for="Game.UpdatedAtDt" class="form-control" />
-                <span asp-validation-for="Game.UpdatedAtDt" class="text-danger"></span>
+                <label asp-for="@Model.Number2">How many AI players:</label>
+                <input asp-for="@Model.Number2" type="number" min="1" max="5" required>
+                <span asp-validation-for="@Model.Number2"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Game.State" class="control-label"></label>
-                <input asp-for="Game.State" class="form-control" />
-                <span asp-validation-for="Game.State" class="text-danger"></span>
+                <label asp-for="@Model.DeckSize">How many packs of cards:</label>
+                <input asp-for="@Model.DeckSize" type="number" min="1" max="3" required>
+                <span asp-validation-for="@Model.DeckSize"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label asp-for="@Model.HandSize">Size of the hand:</label>
+                <input asp-for="@Model.HandSize" type="number" min="2" max="10" required>
+                <span asp-validation-for="@Model.HandSize"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="button-45"/>
             </div>
         </form>
     </div>

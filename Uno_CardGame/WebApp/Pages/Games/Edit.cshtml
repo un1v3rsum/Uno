@@ -7,35 +7,41 @@
 
 <h1>Edit</h1>
 
-<h4>Game</h4>
+<h4>Game @Model.Game.Id</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Game.CreatedAtDt" class="control-label"></label>
-                <input asp-for="Game.CreatedAtDt" class="form-control" />
-                <span asp-validation-for="Game.CreatedAtDt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Game.UpdatedAtDt" class="control-label"></label>
-                <input asp-for="Game.UpdatedAtDt" class="form-control" />
-                <span asp-validation-for="Game.UpdatedAtDt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Game.State" class="control-label"></label>
-                <input asp-for="Game.State" class="form-control" />
-                <span asp-validation-for="Game.State" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Game.Id" />
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<h1>List of players</h1>
 
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                NICKNAME
+            </th>
+            <th>
+                PLAYERTYPE
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Game.Players) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NickName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlayerType)
+                </td>
+                <td>
+                    @*<a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a> |*@
+                    <a asp-page="/Players/Edit" asp-route-id="@item.Id">Edit</a>
+                    
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
 <div>
     <a asp-page="./Index">Back to List</a>
 </div>

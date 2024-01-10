@@ -30,7 +30,8 @@ namespace WebApp.Pages_Games
                 return NotFound();
             }
 
-            var game =  await _context.Games.FirstOrDefaultAsync(m => m.Id == id);
+            var game =  await _context.Games.Include(g =>g.Players)
+                                            .FirstOrDefaultAsync(m => m.Id == id);
             if (game == null)
             {
                 return NotFound();

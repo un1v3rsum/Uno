@@ -3,12 +3,25 @@
 @{
     ViewData["Title"] = "Home page";
 }
+<head>
+        <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true"/>
+    <style>
+        body {
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            background-image: url('https://cdn.akamai.steamstatic.com/steam/apps/470220/capsule_616x353.jpg?t=1680017426'); /* Replace 'your-image.jpg' with the path to your image */
+            background-size: cover; /* Cover the entire viewport */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+        }
+    </style>
+</head>
+<body>
+<form method="post">
+    <div>
+        <input type="hidden" value="true"/>
+        <a asp-page="Games/Create" class="button-45"  id="startGame" class="btn btn-primary">New Game</a>
+    </div>
+</form>
+</body>
 
-<div class="text-center">
-    <h1 class="display-4">UNO</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-
-<hr/>
-
-<h3>There is @Model.Count saved games in db.</h3>

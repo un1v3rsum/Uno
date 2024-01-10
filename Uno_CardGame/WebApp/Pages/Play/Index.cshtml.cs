@@ -22,7 +22,7 @@ public class Index : PageModel
     //attribute to get the Id values
     [BindProperty(SupportsGet = true)]public Guid GameId { get; set; }
     [BindProperty(SupportsGet = true)]public Guid PlayerId { get; set; }
-    [BindProperty] public int SelectedCardIndex { get; set; } = default!;
+    [BindProperty] public int SelectedCardIndex { get; set; } 
     [BindProperty]public string SelectedCardColor { get; set; } 
     [BindProperty]public bool ColorSelection { get; set; } 
     [BindProperty]public bool CardPlayed { get; set; } 
@@ -47,8 +47,8 @@ public class Index : PageModel
         EndMove = false;
 
         if (!GameEngine.IsHandFinished())
-        {
-                    //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
+        { 
+            //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
                 
         //<<<<<================ SKIP ===================>>>>>
         if (GameEngine.State.DiscardedCards.Last().CardValue == ECardValues.Skip)

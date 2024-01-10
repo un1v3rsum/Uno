@@ -8,7 +8,7 @@ public class GameEngine
     public IGameRepository GameRepository { get; set; }
     public GameState State { get; set; } = new GameState();
     //modify starting hand size
-    private const int InitialHandSize = 7;
+    public int InitialHandSize = 7;
     public bool GameDone { get; set; }
     public bool HandDone { get; set; }
 
@@ -434,5 +434,137 @@ public class GameEngine
         }
         return idx;
     }
+    //method for changing the deck size on console
+    public string? SetDeckSizeConsole()
+    {
+        Console.WriteLine("Max 3 packs of cards can be used.");
+        bool correctCount = false;
+        do
+        {
+            Console.Write("Insert nr of packs:"); 
+            var countStr = Console.ReadLine();
+            if (countStr is "1" or "2" or "3")
+            {
+                State.CardDeck.Size = int.Parse(countStr);
+                correctCount = true;
+            }
+            else
+            {
+                Console.WriteLine("ERROR! You have to insert an integer between 1 - 3.");
+            }
+        } while (correctCount == false);
+        UpdateGame();
+        return null;
+    }
+//method for changing the deck type CURRENTLY NOT AVAILABLE
+    public string? SetDeckType()
+    {
+        State.CardDeck.DeckType = (State.CardDeck.DeckType == ECardDeckType.Modern) 
+            ? ECardDeckType.Original 
+            : ECardDeckType.Modern;
+        UpdateGame();
+        return null;
+    }
+    //method for setting playerCount on console
+    public string SetPlayerCountConsole()
+    {
+        Console.WriteLine("Game can have 2 - 10 players.");
+        bool correctCount = false;
+        int count;
+        do
+        {
+            Console.Write("Insert player count:"); 
+            var countStr = Console.ReadLine();
+            int.TryParse(countStr,out count);
+            if (count is < 2 or > 10)
+            {
+                Console.WriteLine("ERROR! You have to insert an integer between 2 - 10.");
+            }
+            else
+            {
+                correctCount = true;
+            }
+        } while (correctCount == false);
+        //create new list of Players, initially all human
+        State.Players = new List<Player>();
+        for (int i = 0; i < count; i++)
+        {
+            State.Players.Add(new Player()
+            {
+                NickName   = "Player " + (i+1),
+                PlayerType = EPlayerType.Human,
+                Score = 0,
+            });
+        }
+        UpdateGame();
+        return null;
+    }
+    //method for changing players names and types on console
+    public string? EditPlayerNamesAndTypesConsole()
+    {
+        for (var i = 0; i < State.Players.Count; i++)
+        {
+            var realType = false;
+            Console.Write("Enter " + (i+1) + ". player name: ");
+            State.Players[i].NickName = Console.ReadLine();
+            do
+            { 
+                Console.Write("Is player " + (i+1) + " human (press: h) or AI (press: a)?: ");
+                var answer = Console.ReadLine();
+                if (answer != "h" && answer != "a")
+                {
+                    Console.WriteLine("ERROR! Press the letter 'h' or 'a' on your keyboard.");
+                }
+                switch (answer)
+                {
+                    case "h":
+                        State.Players[i].PlayerType = EPlayerType.Human;
+                        realType = true;
+                        break;
+                    case "a":
+                        State.Players[i].PlayerType = EPlayerType.Ai;
+                        realType = true;
+                        break;
+                }
+            } while (realType == false);
+        }
+        UpdateGame();
+        return null;
+    }
+
+    public void SetPlayerCount(int humanCount, int aiCount)
+    {
+        //create new list of Players, initially all human
+        State.Players = new List<Player>();
+        for (int i = 0; i < humanCount; i++)
+        {
+            State.Players.Add(new Player()
+            {
+                NickName   = "Human " + (i+1),
+                PlayerType = EPlayerType.Human,
+                Score = 0,
+            });
+        }
+        for (int i = 0; i < aiCount; i++)
+        {
+            State.Players.Add(new Player()
+            {
+                NickName   = "AI " + (i+1),
+                PlayerType = EPlayerType.Ai,
+                Score = 0,
+            });
+        }
+    }
+    //method for changing the deck size
+    public void SetDeckSize(int size)
+    {
+        State.CardDeck.Size = size;
+    }
+    public void SetHandSize(int size)
+    {
+        InitialHandSize = size;
+    }
     
+    
+
 }

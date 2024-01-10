@@ -43,110 +43,13 @@ using var db = new AppDbContext(contextOptions);
 var gameRepository = new GameRepositoryEF(db);
 //<<<====================== DATABASE SAVE OPTIONS ====================>>>
 
+//<<<====================== CREATE THE GAME ====================>>>
 //create gameEngine
 var game = new GameEngine(gameRepository);
 //create gameController
 var gameController = new GameController(game,gameRepository);
 
-//method for setting playerCount 
-string SetPlayerCount()
-{
-    Console.WriteLine("Game can have 2 - 10 players.");
-    bool correctCount = false;
-    int count;
-    do
-    {
-        Console.Write("Insert player count:"); 
-        var countStr = Console.ReadLine();
-        int.TryParse(countStr,out count);
-        if (count is < 2 or > 10)
-        {
-            Console.WriteLine("ERROR! You have to insert an integer between 2 - 10.");
-        }
-        else
-        {
-            correctCount = true;
-        }
-    } while (correctCount == false);
-    //create new list of Players, initially all human
-    game.State.Players = new List<Player>();
-    for (int i = 0; i < count; i++)
-    {
-        game.State.Players.Add(new Player()
-        {
-            NickName   = "Player " + (i+1),
-            PlayerType = EPlayerType.Human,
-            Score = 0,
-        });
-    }
-    game.UpdateGame();
-    return null;
-}
-//method for changing players names and types
-string? EditPlayerNamesAndTypes()
-{
-    for (var i = 0; i < game.State.Players.Count; i++)
-    {
-        var realType = false;
-        Console.Write("Enter " + (i+1) + ". player name: ");
-        game.State.Players[i].NickName = Console.ReadLine();
-        do
-        { 
-            Console.Write("Is player " + (i+1) + " human (press: h) or AI (press: a)?: ");
-            var answer = Console.ReadLine();
-            if (answer != "h" && answer != "a")
-            {
-                Console.WriteLine("ERROR! Press the letter 'h' or 'a' on your keyboard.");
-            }
-            switch (answer)
-            {
-                case "h":
-                    game.State.Players[i].PlayerType = EPlayerType.Human;
-                    realType = true;
-                    break;
-                case "a":
-                    game.State.Players[i].PlayerType = EPlayerType.Ai;
-                    realType = true;
-                    break;
-            }
-        } while (realType == false);
-    }
-    game.UpdateGame();
-    return null;
-}
-
-//method for changing the deck size
-string? SetDeckSize()
-{
-    Console.WriteLine("Max 3 packs of cards can be used.");
-    bool correctCount = false;
-    do
-    {
-        Console.Write("Insert nr of packs:"); 
-        var countStr = Console.ReadLine();
-        if (countStr is "1" or "2" or "3")
-        {
-            game.State.CardDeck.Size = int.Parse(countStr);
-            correctCount = true;
-        }
-        else
-        {
-            Console.WriteLine("ERROR! You have to insert an integer between 1 - 3.");
-        }
-    } while (correctCount == false);
-    game.UpdateGame();
-    return null;
-}
-//method for changing the deck type
-string? SetDeckType()
-{
-    game.State.CardDeck.DeckType = (game.State.CardDeck.DeckType == ECardDeckType.Modern) 
-            ? ECardDeckType.Original 
-            : ECardDeckType.Modern;
-    game.UpdateGame();
-    return null;
-}
-
+//Options MENU
 string? RunOptionsMenu()
 {
     //constructing new optionsMenu with items
@@ -156,7 +59,7 @@ string? RunOptionsMenu()
                 "No of card-packs used: "+ game.State.CardDeck.Size, 
                 (() => "No of card-packs used: "+game.State.CardDeck.Size.ToString()),//anonym. func
                 "p", 
-                SetDeckSize
+                game.SetDeckSizeConsole
                 ),
             //TODO modernDeckType UNO after year 2018
             // new MenuItem(
@@ -177,7 +80,7 @@ string? RunOptionsMenu()
     //returns and activates new menu
     return optionsGameMenu.Run();;
 }
-//method for picking New Game
+//New Game MENU
 string? RunNewGameMenu()
 {
     //constructing new menu with items
@@ -187,12 +90,12 @@ string? RunNewGameMenu()
                 "Player count: "+game.State.Players.Count, 
                 (() => "Player count: "+game.State.Players.Count.ToString()),
                 "c", 
-                SetPlayerCount),
+                game.SetPlayerCountConsole),
             new MenuItem(
                 "Edit players: " + string.Join(", ", game.State.Players), 
                 (() => "Edit players: "+ string.Join(", ", game.State.Players)),
                 "t", 
-                EditPlayerNamesAndTypes),
+                game.EditPlayerNamesAndTypesConsole),
             new MenuItem(
                 "Start the game of UNO", 
                 null,
@@ -203,7 +106,7 @@ string? RunNewGameMenu()
     //returns and activates new menu
     return startNewGameMenu.Run();
 }
-//Initial mainMenu 
+//Main Menu
 var mainMenu = new Menu(EMenuLevel.First,">> UNO <<", new List<MenuItem>()
 {
     new MenuItem(
@@ -275,7 +178,7 @@ string? LoadGame()
     return null;
 }
 
-//run the mainMenu 
+//<<<====================== START THE GAME from MAIN MENU ====================>>>
 mainMenu.Run();
 
 
