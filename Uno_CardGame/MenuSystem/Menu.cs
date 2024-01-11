@@ -4,16 +4,17 @@ namespace MenuSystem;
 //menu class
 public class Menu
 {
-    private readonly EMenuLevel _level;
-    public string? Title { get; set; }
-    
-    public List<MenuItem> MItems { get; set; }
     //container for menuItems
     public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
+    //Menu attributes
+    private readonly EMenuLevel _level;
+    public string? Title { get; set; }
     private const string MenuSeparator = "=======================";
     private const string ShortcutExit = "x";
     private const string ShortcutBack = "b";
     private const string ShortcutReturnToMain = "r";
+    
+    
     //private menuItems, not accessible by the player 
     private readonly MenuItem _menuItemExit = new MenuItem(
         "Exit",
@@ -31,10 +32,13 @@ public class Menu
         ShortcutReturnToMain, 
         null);
     
+    //menu constructor - inputs menulevel, title and container of menuitems
     public Menu(EMenuLevel level, string? title, List<MenuItem> menuItems)
     {
+        //assign values to lvl and title
         _level = level;
         Title = title;
+        
         foreach (var menuItem in menuItems)
         {   
             //exception for repeating shortcuts
@@ -59,6 +63,7 @@ public class Menu
     //method for drawing the menusystem
     private void Draw()
     {
+        //start with title and menuseparator
         if (!string.IsNullOrWhiteSpace(Title))
         {
             Console.WriteLine(Title);
@@ -75,7 +80,7 @@ public class Menu
                 ? menuItem.Value.MenuLabelFunction()
                 //otherwise show menuLabel
                 : menuItem.Value.MenuLabel);
-        }
+        }//end with menuseparator
         Console.WriteLine(MenuSeparator);
         Console.Write("Your choice:");
     }

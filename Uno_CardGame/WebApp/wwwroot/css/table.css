@@ -1,0 +1,36 @@
+tr:nth-child(even) {
+    background-color: rgba(105, 149, 208, 0.63);
+}
+
+th:nth-child(even),td:nth-child(even) {
+    background-color: rgba(181, 241, 206, 0.63);
+}
+
+.button-45 {
+    float: left;
+    background: #198754;
+    border-radius: 11px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-family: Mija,-apple-system,BlinkMacSystemFont,Roboto,"Roboto Slab","Droid Serif","Segoe UI",system-ui,Arial,sans-serif;
+    font-size: 1.15em;
+    font-weight: 700;
+    justify-content: center;
+    line-height: 33.4929px;
+    padding: .8em 1em;
+    text-align: center;
+    text-decoration: none;
+    text-decoration-skip-ink: auto;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    text-underline-offset: 1px;
+    transition: all .2s ease-in-out;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: 20%;
+    word-break: break-word;
+    border: 0;
+    margin: 10px;
+}

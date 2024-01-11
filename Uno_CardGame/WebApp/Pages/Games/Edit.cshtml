@@ -4,13 +4,13 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
+<!-- GAME EDIT PAGE -->
 <h1>Edit</h1>
 
 <h4>Game @Model.Game.Id</h4>
 <hr />
 <h1>List of players</h1>
-
+<!-- ONLY NICKNAME AND PLAYERTYPE ARE EDITABLE -->
 <table class="table">
     <thead>
         <tr>
@@ -31,12 +31,12 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PlayerType)
-                </td>
+                </td><!-- DETAILS AND DELETE OPTION NOT AVAILABLE -->
                 <td>
                     @*<a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
                     <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a> |*@
                     <a asp-page="/Players/Edit" asp-route-id="@item.Id">Edit</a>
-                    
+                    <!-- ROUTE TO PLAYER EDIT PAGE -->
                 </td>
             </tr>
     }

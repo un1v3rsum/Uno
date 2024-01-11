@@ -25,7 +25,7 @@ namespace WebApp.Pages_Players
         }
         public IList<Game> Games { get;set; } = default!;
         public IList<Player> Players { get;set; } = default!;
-
+        
         public async Task OnGetAsync()
         {
             if (_context.Players != null)
@@ -40,6 +40,9 @@ namespace WebApp.Pages_Players
                     .OrderByDescending(g => g.UpdatedAtDt)
                     .ToListAsync();
             }
+            //open games and change player names & types if changes were made in web
+            //(NB! makes players page slow because loops through all the data in db)
+            //TODO optimize code, bigger db = slower app
             foreach (var game in Games)
             {
 

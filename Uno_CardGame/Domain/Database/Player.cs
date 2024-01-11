@@ -15,7 +15,7 @@ public class Player : BaseEntity
     public EPlayerType PlayerType { get; set; }
     
     //FOREIGN KEY 
-    //GameId can't be null because every player has to have 1 game relationship
+    //GameId can't be null because every player has to have 1 game relationship - NO PLAYER CAN EXIST WITHOUT A GAME
     public Guid GameId { get; set; }
     public Game? Game { get; set; } 
     //nullability decides relationship type

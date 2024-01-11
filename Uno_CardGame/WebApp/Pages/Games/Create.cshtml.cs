@@ -43,7 +43,7 @@ namespace WebApp.Pages_Games
           {
               return Page();
           }
-
+            //on post creates a new game, modifies the values and saves the game to the repository
           GameEngine = new GameEngine(_gameRepository);
           GameEngine.SetPlayerCount(Number1,Number2);
           GameEngine.SetDeckSize(DeckSize);
@@ -51,7 +51,7 @@ namespace WebApp.Pages_Games
           GameEngine.UpdateGame();
           _gameRepository.SaveGame(GameEngine.State.Id, GameEngine.State);
           
-            return RedirectToPage("./Index");
+          return RedirectToPage("./Index");
         }
     }
 }

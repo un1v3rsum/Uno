@@ -23,6 +23,7 @@ namespace WebApp.Pages_Games
 
         public async Task OnGetAsync()
         {
+            //gets all the games
             if (_context.Games != null)
             {
                 Game = await _context.Games

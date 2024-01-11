@@ -9,7 +9,7 @@ public class CardDeck
     public List<GameCard> Cards { get; set; }
     public int Size { get; set; } 
     //cardDeck constructor
-    //108 cards for original deckType and 112 for modern deckType
+    //108 cards for original deckType and 112 for modern deckType TODO modern
     public CardDeck(int size, ECardDeckType deckType)
     {   //define the amount of cardPacks in deck
         Size = size;
@@ -126,19 +126,22 @@ public class CardDeck
     //deck shuffling method (Knuth-Fisher-Yates)
     public void Shuffle()
     {
-        Random r = new Random();//new random engine
+        var r = new Random();//new random engine
         List<GameCard> unShuffledCards = Cards;
         //Step 1: For each unShuffled item in the collection
-        for (int n = unShuffledCards.Count - 1; n > 0; --n)
+        for (var n = unShuffledCards.Count - 1; n > 0; --n)
         {
             //Step 2: Randomly pick an item which has not been shuffled
-            int k = r.Next(n + 1);
+            var k = r.Next(n + 1);
             //Step 3: Swap the selected item with the last "unstruck" card in the collection
             
+            //<=== Same as the one-liner below ===>
             //GameCard temp = unShuffledCards[n];
             //unShuffledCards[n] = unShuffledCards[k];
             //unShuffledCards[k] = temp;
+            //<=== Same as the one-liner below ===>
             //<swap via deconstruction>
+            
             (unShuffledCards[n], unShuffledCards[k]) = (unShuffledCards[k], unShuffledCards[n]);
         }
     }

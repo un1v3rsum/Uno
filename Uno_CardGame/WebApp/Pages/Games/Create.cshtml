@@ -6,7 +6,7 @@
 }
 
 <h1>New Game</h1>
-
+<!--Input new game properties -->
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -30,7 +30,7 @@
                 <label asp-for="@Model.HandSize">Size of the hand:</label>
                 <input asp-for="@Model.HandSize" type="number" min="2" max="10" required>
                 <span asp-validation-for="@Model.HandSize"></span>
-            </div>
+            </div><!--create the game -->
             <div class="form-group">
                 <input type="submit" value="Create" class="button-45"/>
             </div>
@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<div>
+<div><!--back to games index page -->
     <a asp-page="Index">Back to List</a>
 </div>
 

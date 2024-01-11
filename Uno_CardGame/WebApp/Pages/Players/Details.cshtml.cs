@@ -18,7 +18,7 @@ namespace WebApp.Pages_Players
         {
             _context = context;
         }
-
+        //just gets the player
       public Player Player { get; set; } = default!; 
 
         public async Task<IActionResult> OnGetAsync(Guid? id)

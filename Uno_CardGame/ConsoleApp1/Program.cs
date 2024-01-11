@@ -38,7 +38,7 @@ var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
 //no need for ->  db.dispose() afterwards
 using var db = new AppDbContext(contextOptions);
 //create database and do the migrations if database doesnt already exist
-//db.Database.Migrate();
+db.Database.Migrate();
 //create gamerepository in db
 var gameRepository = new GameRepositoryEF(db);
 //<<<====================== DATABASE SAVE OPTIONS ====================>>>
@@ -57,7 +57,7 @@ string? RunOptionsMenu()
         {
             new MenuItem(
                 "No of card-packs used: "+ game.State.CardDeck.Size, 
-                (() => "No of card-packs used: "+game.State.CardDeck.Size.ToString()),//anonym. func
+                (() => "No of card-packs used: "+game.State.CardDeck.Size),//anonym. func
                 "p", 
                 game.SetDeckSizeConsole
                 ),
@@ -73,6 +73,12 @@ string? RunOptionsMenu()
                 null,
                 "t", 
                 null
+            ),
+            new MenuItem(
+                "Hand size: "+ game.State.InitialHandSize, 
+                (() => "Hand size: "+ game.State.InitialHandSize),
+                "h", 
+                game.SetHandSizeConsole
             ),
         }
     );

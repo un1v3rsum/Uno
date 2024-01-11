@@ -28,7 +28,7 @@ namespace WebApp.Pages_Players
             {
                 return NotFound();
             }
-
+            //gets the player
             var player = await _context.Players.FirstOrDefaultAsync(m => m.Id == id);
 
             if (player == null)
@@ -49,7 +49,7 @@ namespace WebApp.Pages_Players
                 return NotFound();
             }
             var player = await _context.Players.FindAsync(id);
-
+            //deletes the player
             if (player != null)
             {
                 Player = player;

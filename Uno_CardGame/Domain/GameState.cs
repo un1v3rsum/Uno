@@ -6,6 +6,7 @@ public class GameState
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public List<Player> Players { get; set; }
+    public int InitialHandSize { get; set; } = 7;
     public int ActivePlayerNo { get; set; }
     //carddeck default size as 1
     public CardDeck CardDeck { get; set; } = new CardDeck(1, ECardDeckType.Original);

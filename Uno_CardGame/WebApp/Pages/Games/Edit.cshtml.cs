@@ -29,7 +29,7 @@ namespace WebApp.Pages_Games
             {
                 return NotFound();
             }
-
+            //gets all the games and related players
             var game =  await _context.Games.Include(g =>g.Players)
                                             .FirstOrDefaultAsync(m => m.Id == id);
             if (game == null)

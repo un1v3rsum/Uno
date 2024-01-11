@@ -105,13 +105,14 @@
                     </div>
                 }
                 else
-                {<!--Render play card button -->
+                {<!--Render play card button and UNO checkbox -->
                     <div>
+                        <input type="checkbox" asp-for=@Model.Uno value="true"/>UNO
                         <input type="hidden" asp-for="CardPlayed" value="true"/>
                         <button class="button-45" type="submit" id="playButton" class="btn btn-primary" style="display:none;">Play card</button>
                     </div>
                     <div class="clearfix"></div>
-                    <div>   <!--Render players cards on hand, disabled if not a VALID move -->
+                    <div> <!--Render players cards on hand, disabled if not a VALID move -->
                         @foreach (var card in Model
                                       .GameEngine
                                       .State

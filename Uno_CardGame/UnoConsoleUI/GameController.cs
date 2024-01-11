@@ -47,6 +47,8 @@ public class GameController
                 {
                     //draws one card, checks its validity and plays if allowed
                     _gameEngine.DrewCard(1);
+                    Console.WriteLine("Press any key to continue..");
+                    Console.Read();
                 }
                 //<<<<<================ IF PREVIOUS CARDS WERE ACTION CARDS ===============================>>>>>
                 
@@ -68,6 +70,8 @@ public class GameController
                                 .NickName } " + $"misses his turn! ");
                         //move on to next player
                         _gameEngine.NextPlayer();
+                        Console.WriteLine("Press any key to continue..");
+                        Console.Read();
                     }
                 }
                 //<<<<<================ REVERSE ===================>>>>>
@@ -79,6 +83,8 @@ public class GameController
                     {
                         //then gameDirection is reversed
                         _gameEngine.SetGameDirection();
+                        Console.WriteLine("Press any key to continue..");
+                        Console.Read();
                         //and next player is picked
                         //since PlayerMove() already went over to next player before gamedirection was set, 
                         //then we go back to the player before Reverse card player
@@ -103,49 +109,60 @@ public class GameController
                                 .NickName} " + $"misses his turn! ");
                         
                         _gameEngine.DrewCard(2);
+                        Console.WriteLine("Press any key to continue..");
+                        Console.Read();
                     }
                 }
                 //<<<<<================ WILD ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardColor == ECardColor.Wild)
                 {
-                    //get color input from player
-                    var colorChoice = "";
-                    var input = false;
-                    do
+                    if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour
+                        && _gameEngine.State.TurnResult == ETurnResult.GameStart)
                     {
-                        ConsoleVizualisation.ShowDeclaringAColor(_gameEngine.State);
-                        //if human declares a color
-                        if (_gameEngine
-                                .State
-                                .Players[_gameEngine.State.ActivePlayerNo]
-                                .PlayerType == EPlayerType.Human)
+                        Console.WriteLine("FIRST DRAW IN THE GAME IS WILD+4, CARD IS PUT BACK TO THE DECK!");
+                    }
+                    else
+                    {
+                        //get color input from player
+                        var colorChoice = "";
+                        var input = false;
+                        do
                         {
-                            //read in the choice from console
-                            colorChoice = Console.ReadLine()!.ToLower().Trim();
-                        }
-                        //if AI declares a color
-                        else
-                        {
-                            //picks a random color
-                            Random random = new Random();
-                            colorChoice = random.Next(1, 5).ToString();
-                        }
+                            ConsoleVizualisation.ShowDeclaringAColor(_gameEngine.State);
+                            //if human declares a color
+                            if (_gameEngine
+                                    .State
+                                    .Players[_gameEngine.State.ActivePlayerNo]
+                                    .PlayerType == EPlayerType.Human)
+                            {
+                                //read in the choice from console
+                                colorChoice = Console.ReadLine()!.ToLower().Trim();
+                            }
+                            //if AI declares a color
+                            else
+                            {
+                                //picks a random color
+                                Random random = new Random();
+                                colorChoice = random.Next(1, 5).ToString();
+                            }
 
-                        if (colorChoice is "1" or "2" or "3" or "4"  )
-                        {
-                            input = true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Undefined shortcut (declare color)!");
-                        }
+                            if (colorChoice is "1" or "2" or "3" or "4"  )
+                            {
+                                input = true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Undefined shortcut (declare color)!");
+                            }
                         
-                    } while (input == false);
-                    //declare the color
-                    _gameEngine.DeclareColor(colorChoice);
-                    ConsoleVizualisation.ShowNewDeclaredColor(_gameEngine.State);
-                    //move on to next player
-                    _gameEngine.NextPlayer();
+                        } while (input == false);
+                        //declare the color
+                        _gameEngine.DeclareColor(colorChoice);
+                        ConsoleVizualisation.ShowNewDeclaredColor(_gameEngine.State);
+                        //move on to next player
+                        _gameEngine.NextPlayer();
+                    }
+                    
                 }
                 //<<<<<================ WILD + DRAW FOUR ===================>>>>>
                 if (_gameEngine.State.DiscardedCards.Last().CardValue == ECardValues.DrawFour)
@@ -153,7 +170,6 @@ public class GameController
                     //if it is the first draw of the game
                     if (_gameEngine.State.TurnResult == ETurnResult.GameStart)
                     {
-                        Console.WriteLine("FIRST DRAW IN THE GAME, CARD IS PUT BACK TO THE DECK!");
                         //first card in discardpile is put back into the deck 
                         _gameEngine
                             .State
@@ -184,6 +200,8 @@ public class GameController
                                 .NickName} " + $"misses his turn! ");
                         //and draws 4 cards
                         _gameEngine.DrewCard(4);
+                        Console.WriteLine("Press any key to continue..");
+                        Console.Read();
                     }
                 }
                 //<<<<<================ IF PREVIOUS CARDS WERE NUMBER CARDS ===============================>>>>>
@@ -264,7 +282,6 @@ public class GameController
                 //<<<<<================ PLAYER MAKES AN ACTUAL MOVE ===================>>>>>
                 _gameEngine.MakeAMove(choice);
                 
-                                
                 //<<<<<================ SAVE GAME AFTER EVERY MOVE ===================>>>>>
                 _gameRepository.SaveGame(_gameEngine.State.Id, _gameEngine.State);
                 

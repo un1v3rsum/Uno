@@ -32,7 +32,7 @@ namespace WebApp.Pages_Players
             {
                 return NotFound();
             }
-
+            //get all the players and games in db
             var player =  await _context.Players.FirstOrDefaultAsync(m => m.Id == id);
             
             if (player == null)
@@ -69,7 +69,7 @@ namespace WebApp.Pages_Players
                 return Page();
             }
             _context.Attach(Player).State = EntityState.Modified;
-            
+            //saves changes to db but doesn't modify the real games
             try
             {
                 await _context.SaveChangesAsync();

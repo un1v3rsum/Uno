@@ -4,7 +4,7 @@ using Domain.Database;
 using Helpers;
 
 namespace DAL;
-
+//<<========================= ENTITY FRAMEWORK GAMEREPOSITORY ==============================>>
 public class GameRepositoryEF : IGameRepository
 {
     private readonly AppDbContext _context;
